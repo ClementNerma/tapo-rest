@@ -1,26 +1,38 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
+
+use anyhow::Result;
 
 use crate::devices::TapoDevice;
+
+use super::sessions::Sessions;
+
+pub struct StateInit {
+    pub auth_password: String,
+    pub devices: Vec<TapoDevice>,
+    pub sessions_file: PathBuf,
+}
 
 pub struct State {
     pub auth_password: String,
     pub devices: HashMap<String, TapoDevice>,
-    pub sessions: HashMap<String, Session>,
+    pub sessions: Sessions,
 }
 
 impl State {
-    pub fn new(auth_password: String, devices: Vec<TapoDevice>) -> Self {
-        Self {
+    pub async fn init(
+        StateInit {
+            auth_password,
+            devices,
+            sessions_file,
+        }: StateInit,
+    ) -> Result<Self> {
+        Ok(Self {
             auth_password,
             devices: devices
                 .into_iter()
                 .map(|device| (device.name.clone(), device))
                 .collect(),
-            sessions: HashMap::new(),
-        }
+            sessions: Sessions::create(sessions_file).await?,
+        })
     }
-}
-
-pub struct Session {
-    // TODO: permissions? only access to specific bulbs, etc.?
 }

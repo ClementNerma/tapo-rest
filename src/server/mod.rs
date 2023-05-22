@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{path::PathBuf, sync::Arc};
 
 use anyhow::Result;
 use axum::{
@@ -9,12 +9,13 @@ use axum::{
 use tokio::sync::RwLock;
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
-use crate::{cmd::ServerConfig, devices::TapoDevice};
+use crate::{cmd::ServerConfig, devices::TapoDevice, server::state::StateInit};
 
 use self::state::State;
 
 mod actions;
 mod auth;
+mod sessions;
 mod state;
 
 pub type SharedStateInner = State;
@@ -22,7 +23,11 @@ pub type SharedState = Arc<RwLock<SharedStateInner>>;
 
 pub type ApiResult<T> = Result<T, (StatusCode, String)>;
 
-pub async fn serve(config: ServerConfig, devices: Vec<TapoDevice>) -> Result<()> {
+pub async fn serve(
+    config: ServerConfig,
+    devices: Vec<TapoDevice>,
+    sessions_file: PathBuf,
+) -> Result<()> {
     let ServerConfig {
         port,
         auth_password,
@@ -42,11 +47,15 @@ pub async fn serve(config: ServerConfig, devices: Vec<TapoDevice>) -> Result<()>
         .route("/actions/off", get(actions::off))
         .route("/actions/set-brightness", get(actions::set_brightness))
         .layer(cors)
-        .with_state(Arc::new(RwLock::new(State::new(
-            // TODO: hash?
-            auth_password,
-            devices,
-        ))));
+        .with_state(Arc::new(RwLock::new(
+            State::init(StateInit {
+                // TODO: hash?
+                auth_password,
+                devices,
+                sessions_file,
+            })
+            .await?,
+        )));
 
     let addr = format!("0.0.0.0:{port}").parse().unwrap();
 

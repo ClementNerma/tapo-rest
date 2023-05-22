@@ -4,8 +4,8 @@ use clap::Parser;
 
 #[derive(Parser)]
 pub struct Cmd {
-    #[clap(short, long, help = "Path to the configuratino file (.json)")]
-    pub config_path: PathBuf,
+    #[clap(short, long, help = "Path to the devices config file (.json)")]
+    pub devices_config_path: PathBuf,
 
     #[clap(flatten)]
     pub server_config: ServerConfig,

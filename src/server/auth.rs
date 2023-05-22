@@ -1,8 +1,7 @@
 use axum::{extract::State, http::StatusCode, Json};
-use rand::{distributions::Alphanumeric, Rng};
 use serde::Deserialize;
 
-use crate::server::{state::Session, SharedState};
+use crate::server::SharedState;
 
 use super::ApiResult;
 
@@ -25,13 +24,11 @@ pub async fn login(
         ));
     }
 
-    let mut rng = rand::thread_rng();
-
-    let session_id = (1..128)
-        .map(|_| rng.sample(Alphanumeric) as char)
-        .collect::<String>();
-
-    state.sessions.insert(session_id.clone(), Session {});
+    let session_id = state
+        .sessions
+        .insert()
+        .await
+        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, format!("{err}")))?;
 
     Ok(session_id)
 }
