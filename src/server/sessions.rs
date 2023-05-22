@@ -58,7 +58,7 @@ impl Sessions {
     fn _gen_session_id() -> String {
         let mut rng = rand::thread_rng();
 
-        (1..128)
+        (1..32)
             .map(|_| rng.sample(Alphanumeric) as char)
             .collect::<String>()
     }
