@@ -47,7 +47,7 @@ pub async fn serve(config: ServerConfig, devices: Vec<TapoDevice>) -> Result<()>
             devices,
         ))));
 
-    let addr = format!("127.0.0.1:{port}").parse().unwrap();
+    let addr = format!("0.0.0.0:{port}").parse().unwrap();
 
     println!("Launching server on {addr}...");
 
