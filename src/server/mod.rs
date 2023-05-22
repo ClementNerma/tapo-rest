@@ -1,15 +1,15 @@
 use std::{path::PathBuf, sync::Arc};
 
 use anyhow::Result;
-use axum::{
-    http::StatusCode,
-    routing::{get, post},
-    Router, Server,
-};
+use axum::{http::StatusCode, routing::post, Server};
 use tokio::sync::RwLock;
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
-use crate::{cmd::ServerConfig, devices::TapoDevice, server::state::StateInit};
+use crate::{
+    cmd::ServerConfig,
+    devices::TapoDevice,
+    server::{actions::make_router, state::StateInit},
+};
 
 use self::state::State;
 
@@ -41,12 +41,8 @@ pub async fn serve(
             AllowOrigin::any(),
         );
 
-    let app = Router::new()
+    let app = make_router()
         .route("/login", post(auth::login))
-        .route("/actions/on", get(actions::on))
-        .route("/actions/off", get(actions::off))
-        .route("/actions/set-brightness", get(actions::set_brightness))
-        .route("/actions/set-color", get(actions::set_color))
         .layer(cors)
         .with_state(Arc::new(RwLock::new(
             State::init(StateInit {
