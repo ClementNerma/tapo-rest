@@ -46,6 +46,7 @@ pub async fn serve(
         .route("/actions/on", get(actions::on))
         .route("/actions/off", get(actions::off))
         .route("/actions/set-brightness", get(actions::set_brightness))
+        .route("/actions/set-color", get(actions::set_color))
         .layer(cors)
         .with_state(Arc::new(RwLock::new(
             State::init(StateInit {

@@ -5,6 +5,7 @@ use axum::{
     TypedHeader,
 };
 use serde::Deserialize;
+use tapo::requests::Color;
 
 use crate::devices::{TapoDevice, TapoDeviceInner};
 
@@ -71,6 +72,31 @@ pub async fn set_brightness(
     match &device.inner {
         TapoDeviceInner::L530(client) => client
             .set_brightness(level)
+            .await
+            .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, format!("{err}")))?,
+    }
+
+    Ok("OK")
+}
+
+#[derive(Deserialize)]
+pub struct SetColorParams {
+    name: Color,
+}
+
+pub async fn set_color(
+    TypedHeader(auth_header): TypedHeader<Authorization<Bearer>>,
+    Query(device_name): Query<DeviceNameQuery>,
+    State(state): State<SharedState>,
+    Query(SetColorParams { name }): Query<SetColorParams>,
+) -> ApiResult<&'static str> {
+    let state = state.read().await;
+
+    let device = get_device(auth_header, &device_name, &state).await?;
+
+    match &device.inner {
+        TapoDeviceInner::L530(client) => client
+            .set_color(name)
             .await
             .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, format!("{err}")))?,
     }
