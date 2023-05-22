@@ -40,6 +40,7 @@ pub async fn serve(config: ServerConfig, devices: Vec<TapoDevice>) -> Result<()>
         .route("/login", post(auth::login))
         .route("/actions/on", get(actions::on))
         .route("/actions/off", get(actions::off))
+        .route("/actions/set-brightness", get(actions::set_brightness))
         .layer(cors)
         .with_state(Arc::new(RwLock::new(State::new(
             // TODO: hash?
