@@ -10,7 +10,7 @@ use anyhow::{bail, Context, Result};
 use clap::Parser;
 use config::Config;
 use devices::TapoDevice;
-use tokio::task::JoinSet;
+use tokio::{fs, task::JoinSet};
 
 use crate::cmd::Cmd;
 
@@ -31,8 +31,9 @@ async fn main() -> Result<()> {
         .join(env!("CARGO_PKG_NAME"));
 
     if !data_dir.exists() {
-        // NOTE: we can afford to block here as we didn't launch any task or future yet
-        std::fs::create_dir_all(&data_dir).context("Failed to create a local data directory")?;
+        fs::create_dir_all(&data_dir)
+            .await
+            .context("Failed to create a local data directory")?;
     }
 
     if !devices_config_path.is_file() {
@@ -42,8 +43,8 @@ async fn main() -> Result<()> {
         );
     }
 
-    // NOTE: we can afford to block here as we didn't launch any task or future yet
-    let config_str = std::fs::read_to_string(&devices_config_path)
+    let config_str = fs::read_to_string(&devices_config_path)
+        .await
         .context("Failed to read the devices configuration file")?;
 
     let Config { account, devices } = serde_json::from_str(&config_str)
