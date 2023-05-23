@@ -3,7 +3,7 @@ use serde::Deserialize;
 
 use crate::server::SharedState;
 
-use super::ApiResult;
+use super::{ApiError, ApiResult};
 
 #[derive(Deserialize)]
 pub struct LoginData {
@@ -18,17 +18,13 @@ pub async fn login(
     let mut state = state.write().await;
 
     if password != state.auth_password {
-        return Err((
+        return Err(ApiError::new(
             StatusCode::FORBIDDEN,
-            "Invalid credentials provided".to_string(),
+            "Invalid credentials provided",
         ));
     }
 
-    let session_id = state
-        .sessions
-        .insert()
-        .await
-        .map_err(|err| (StatusCode::INTERNAL_SERVER_ERROR, format!("{err}")))?;
+    let session_id = state.sessions.insert().await?;
 
     Ok(session_id)
 }

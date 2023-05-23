@@ -1,7 +1,7 @@
 use std::{path::PathBuf, sync::Arc};
 
 use anyhow::Result;
-use axum::{http::StatusCode, routing::post, Server};
+use axum::{routing::post, Server};
 use tokio::sync::RwLock;
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
@@ -15,13 +15,14 @@ use self::state::State;
 
 mod actions;
 mod auth;
+mod errors;
 mod sessions;
 mod state;
 
+pub use errors::{ApiError, ApiResult};
+
 pub type SharedStateInner = State;
 pub type SharedState = Arc<RwLock<SharedStateInner>>;
-
-pub type ApiResult<T> = Result<T, (StatusCode, String)>;
 
 pub async fn serve(
     config: ServerConfig,

@@ -1,9 +1,13 @@
 macro_rules! routes {
-    ($($device_name:ident {
-        $(async fn $action_name:ident($state_var:ident: #State, $client_var:ident: #Client $(,$param_name:ident : $param_type:ty)*) -> $ret_type:ty $fn_inner:block)+
+    (use { $($prelude:item)* }
+     $($device_name:ident {
+        $(async fn $action_name:ident(&$state_var:ident, &$client_var:ident $(,$param_name:ident : $param_type:ty)*) -> $ret_type:ty $fn_inner:block)+
     })+) => {
         use axum::routing::{get, Router};
         use super::SharedState;
+        mod prelude {
+            $( $prelude )*
+        }
 
         pub fn make_router() -> Router<SharedState> {
             Router::new()
@@ -17,7 +21,7 @@ macro_rules! routes {
         }
 
         $( #[allow(non_snake_case)]
-           pub mod $device_name {
+           mod $device_name {
             use paste::paste;
             use serde::Deserialize;
             use axum::{
@@ -27,9 +31,12 @@ macro_rules! routes {
                 TypedHeader
             };
             use crate::{
-                server::{ApiResult, SharedState},
+                server::{ApiResult, ApiError, SharedState},
                 devices::TapoDeviceInner
             };
+
+            #[allow(unused_imports)]
+            use super::prelude::*;
 
             $(
                 paste! {
@@ -54,28 +61,24 @@ macro_rules! routes {
                     let _ = state
                         .sessions
                         .get(session_id)
-                        .ok_or((StatusCode::FORBIDDEN, "Invalid bearer token".to_string()))?;
+                        .ok_or(ApiError::new(StatusCode::FORBIDDEN, "Invalid bearer token"))?;
 
                     // TODO: session expiration, etc.?
 
-                    let device = state.devices.get(&device).ok_or((
+                    let device = state.devices.get(&device).ok_or(ApiError::new(
                         StatusCode::NOT_FOUND,
-                        "Provided device name was not found".to_string(),
+                        "Provided device name was not found",
                     ))?;
 
                     let client = match &device.inner {
                         TapoDeviceInner::$device_name(client) => client,
-                        _ => return Err((StatusCode::BAD_REQUEST, format!("This route is reserved to '{}' devices", stringify!($device_name))))
+                        _ => return Err(ApiError::new(StatusCode::BAD_REQUEST, format!("This route is reserved to '{}' devices", stringify!($device_name))))
                     };
 
                     #[allow(unused_variables)]
                     let $state_var = &state;
 
                     let $client_var = client;
-
-                    fn tapo_api_err(err: tapo::Error) -> (StatusCode, String) {
-                        (StatusCode::INTERNAL_SERVER_ERROR, format!("{err}"))
-                    }
 
                     $fn_inner
                 }
@@ -85,21 +88,27 @@ macro_rules! routes {
 }
 
 routes! {
+    use {}
+
     L530 {
-        async fn on(state: #State, client: #Client) -> () {
-            client.on().await.map_err(tapo_api_err)
+        async fn on(&state, &client) -> () {
+            client.on().await?;
+            Ok(())
         }
 
-        async fn off(state: #State, client: #Client) -> () {
-            client.off().await.map_err(tapo_api_err)
+        async fn off(&state, &client) -> () {
+            client.off().await?;
+            Ok(())
         }
 
-        async fn set_brightness(state: #State, client: #Client, level: u8) -> () {
-            client.set_brightness(level).await.map_err(tapo_api_err)
+        async fn set_brightness(&state, &client, level: u8) -> () {
+            client.set_brightness(level).await?;
+            Ok(())
         }
 
-        async fn set_color(state: #State, client: #Client, color: tapo::requests::Color) -> () {
-            client.set_color(color).await.map_err(tapo_api_err)
+        async fn set_color(&state, &client, color: tapo::requests::Color) -> () {
+            client.set_color(color).await?;
+            Ok(())
         }
     }
 }
