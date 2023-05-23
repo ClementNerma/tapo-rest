@@ -12,8 +12,8 @@ macro_rules! routes {
         pub fn make_router() -> Router<SharedState> {
             Router::new()
                 $(
-                    $( .route({
-                        let uri = concat!("/", ::paste::paste! { stringify!([<$device_name:lower>]) }, "/", stringify!($action_name));
+                    $( .route(&{
+                        let uri = concat!("/", ::paste::paste! { stringify!([<$device_name:lower>]) }, "/", stringify!($action_name)).replace("_", "-");
                         println!("> Setting up action URI: {uri}");
                         uri
                     }, get(self::$device_name::$action_name)) )+
