@@ -19,6 +19,7 @@ mod errors;
 mod sessions;
 mod state;
 
+pub use actions::TapoDeviceType;
 pub use errors::{ApiError, ApiResult};
 
 pub type SharedStateInner = State;

@@ -2,6 +2,8 @@ use std::net::Ipv4Addr;
 
 use serde::{Deserialize, Serialize};
 
+use crate::server::TapoDeviceType;
+
 #[derive(Serialize, Deserialize)]
 pub struct Config {
     pub account: TapoCredentials,
@@ -19,10 +21,4 @@ pub struct TapoConnectionInfos {
     pub name: String,
     pub device_type: TapoDeviceType,
     pub ip_addr: Ipv4Addr,
-}
-
-#[derive(Serialize, Deserialize)]
-pub enum TapoDeviceType {
-    L510,
-    L530,
 }

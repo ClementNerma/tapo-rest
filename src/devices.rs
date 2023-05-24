@@ -1,7 +1,10 @@
 use anyhow::{Context, Result};
 use tapo::{ApiClient, Authenticated, ColorLightHandler, LightHandler};
 
-use crate::config::{TapoConnectionInfos, TapoCredentials, TapoDeviceType};
+use crate::{
+    config::{TapoConnectionInfos, TapoCredentials},
+    server::TapoDeviceType,
+};
 
 pub struct TapoDevice {
     pub name: String,
@@ -12,6 +15,8 @@ pub struct TapoDevice {
 pub enum TapoDeviceInner {
     L510(LightHandler<Authenticated>),
     L530(ColorLightHandler<Authenticated>),
+    L610(LightHandler<Authenticated>),
+    L630(ColorLightHandler<Authenticated>),
 }
 
 impl TapoDevice {
@@ -48,6 +53,24 @@ impl TapoDevice {
                         })?;
 
                     TapoDeviceInner::L530(auth)
+                }
+
+                TapoDeviceType::L610 => {
+                    let auth =
+                        tapo_client.l610().login().await.with_context(|| {
+                            format!("Failed to login against L610 bulb '{name}'")
+                        })?;
+
+                    TapoDeviceInner::L610(auth)
+                }
+
+                TapoDeviceType::L630 => {
+                    let auth =
+                        tapo_client.l630().login().await.with_context(|| {
+                            format!("Failed to login against L630 bulb '{name}'")
+                        })?;
+
+                    TapoDeviceInner::L630(auth)
                 }
             };
 

@@ -1,23 +1,42 @@
 macro_rules! routes {
     (use mod { $($prelude:item)* }
-     $($device_name:ident {
+     $($device_name:ident $(,$alias_device_name:ident)* {
         $(async fn $action_name:ident(&$state_var:ident, &$client_var:ident $(,$param_name:ident : $param_type:ty)*) -> $ret_type:ty $fn_inner:block)+
     })+) => {
         use axum::routing::{get, Router};
+        use serde::{Serialize, Deserialize};
         use super::SharedState;
+
         mod prelude {
             $( $prelude )*
         }
 
+        #[derive(Serialize, Deserialize)]
+        pub enum TapoDeviceType {
+            $(
+                $device_name,
+                $( $alias_device_name, )*
+            )+
+        }
+
         pub fn make_router() -> Router<SharedState> {
-            Router::new()
-                $(
-                    $( .route(&{
-                        let uri = concat!("/", ::paste::paste! { stringify!([<$device_name:lower>]) }, "/", stringify!($action_name)).replace("_", "-");
+            let mut router = Router::new();
+
+            $(
+                for device_name in [
+                    ::paste::paste! { stringify!([<$device_name:lower>]) }
+                    $(, ::paste::paste! { stringify!([<$alias_device_name:lower>]) } )*
+                ] {
+                    $(
+                        let uri = format!("/{device_name}/{}", stringify!($action_name).replace("_", "-"));
                         println!("> Setting up action URI: {uri}");
-                        uri
-                    }, get(self::$device_name::$action_name)) )+
-                )+
+
+                        router = router.route(&uri, get(self::$device_name::$action_name));
+                    )+
+                }
+            )+
+
+            router
         }
 
         $( #[allow(non_snake_case)]
@@ -96,7 +115,7 @@ routes! {
         };
     }
 
-    L510 {
+    L510, L610 {
         async fn on(&state, &client) -> () {
             client.on().await.map_err(Into::into)
         }
@@ -118,7 +137,7 @@ routes! {
         }
     }
 
-    L530 {
+    L530, L630 {
         async fn on(&state, &client) -> () {
             client.on().await.map_err(Into::into)
         }
