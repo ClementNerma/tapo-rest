@@ -92,8 +92,30 @@ routes! {
         pub use axum::Json;
         pub use tapo::{
             requests::Color,
-            responses::{L530DeviceInfoResult, DeviceUsageResult}
+            responses::{L510DeviceInfoResult, L530DeviceInfoResult, DeviceUsageResult}
         };
+    }
+
+    L510 {
+        async fn on(&state, &client) -> () {
+            client.on().await.map_err(Into::into)
+        }
+
+        async fn off(&state, &client) -> () {
+            client.off().await.map_err(Into::into)
+        }
+
+        async fn set_brightness(&state, &client, level: u8) -> () {
+            client.set_brightness(level).await.map_err(Into::into)
+        }
+
+        async fn get_device_info(&state, &client) -> Json<L510DeviceInfoResult> {
+            Ok(Json(client.get_device_info().await?))
+        }
+
+        async fn get_device_usage(&state, &client) -> Json<DeviceUsageResult> {
+            Ok(Json(client.get_device_usage().await?))
+        }
     }
 
     L530 {

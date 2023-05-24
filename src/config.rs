@@ -23,5 +23,6 @@ pub struct TapoConnectionInfos {
 
 #[derive(Serialize, Deserialize)]
 pub enum TapoDeviceType {
+    L510,
     L530,
 }
