@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use tapo::{ApiClient, Authenticated, ColorLightHandler, LightHandler};
+use tapo::{ApiClient, Authenticated, ColorLightHandler, ColorLightStripHandler, LightHandler};
 
 use crate::{
     config::{TapoConnectionInfos, TapoCredentials},
@@ -18,6 +18,8 @@ pub enum TapoDeviceInner {
     L610(LightHandler<Authenticated>),
     L630(ColorLightHandler<Authenticated>),
     L900(ColorLightHandler<Authenticated>),
+    L920(ColorLightStripHandler<Authenticated>),
+    L930(ColorLightStripHandler<Authenticated>),
 }
 
 impl TapoDevice {
@@ -81,6 +83,24 @@ impl TapoDevice {
                         })?;
 
                     TapoDeviceInner::L900(auth)
+                }
+
+                TapoDeviceType::L920 => {
+                    let auth =
+                        tapo_client.l920().login().await.with_context(|| {
+                            format!("Failed to login against L920 bulb '{name}'")
+                        })?;
+
+                    TapoDeviceInner::L920(auth)
+                }
+
+                TapoDeviceType::L930 => {
+                    let auth =
+                        tapo_client.l930().login().await.with_context(|| {
+                            format!("Failed to login against L930 bulb '{name}'")
+                        })?;
+
+                    TapoDeviceInner::L930(auth)
                 }
             };
 

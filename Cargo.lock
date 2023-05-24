@@ -1347,7 +1347,7 @@ checksum = "2047c6ded9c721764247e62cd3b03c09ffc529b2ba5b10ec482ae507a4a70160"
 [[package]]
 name = "tapo"
 version = "0.6.0"
-source = "git+https://github.com/mihai-dinculescu/tapo.git#05d159cb63d794cb936574ec810cac94a3dc555f"
+source = "git+https://github.com/ClementNerma/tapo.git#093e458de845d3d5139b4c5f440e869654df7cd9"
 dependencies = [
  "anyhow",
  "async-trait",

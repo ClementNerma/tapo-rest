@@ -110,8 +110,8 @@ routes! {
     use mod {
         pub use axum::Json;
         pub use tapo::{
-            requests::Color,
-            responses::{L510DeviceInfoResult, L530DeviceInfoResult, DeviceUsageResult}
+            requests::{Color, LightingEffectPreset},
+            responses::{L510DeviceInfoResult, L530DeviceInfoResult, L930DeviceInfoResult, DeviceUsageResult}
         };
     }
 
@@ -163,6 +163,44 @@ routes! {
         }
 
         async fn get_device_info(&state, &client) -> Json<L530DeviceInfoResult> {
+            Ok(Json(client.get_device_info().await?))
+        }
+
+        async fn get_device_usage(&state, &client) -> Json<DeviceUsageResult> {
+            Ok(Json(client.get_device_usage().await?))
+        }
+    }
+
+    L920, L930 {
+        async fn on(&state, &client) -> () {
+            client.on().await.map_err(Into::into)
+        }
+
+        async fn off(&state, &client) -> () {
+            client.off().await.map_err(Into::into)
+        }
+
+        async fn set_brightness(&state, &client, level: u8) -> () {
+            client.set_brightness(level).await.map_err(Into::into)
+        }
+
+        async fn set_color(&state, &client, color: Color) -> () {
+            client.set_color(color).await.map_err(Into::into)
+        }
+
+        async fn set_hue_saturation(&state, &client, hue: u16, saturation: u8) -> () {
+            client.set_hue_saturation(hue, saturation).await.map_err(Into::into)
+        }
+
+        async fn set_color_temperature(&state, &client, color_temperature: u16) -> () {
+            client.set_color_temperature(color_temperature).await.map_err(Into::into)
+        }
+
+        async fn set_lighting_effect(&state, &client, lighting_effect: LightingEffectPreset) -> () {
+            client.set_lighting_effect(lighting_effect).await.map_err(Into::into)
+        }
+
+        async fn get_device_info(&state, &client) -> Json<L930DeviceInfoResult> {
             Ok(Json(client.get_device_info().await?))
         }
 
