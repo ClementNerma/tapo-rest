@@ -1,7 +1,7 @@
 use std::{path::PathBuf, sync::Arc};
 
 use anyhow::Result;
-use axum::{routing::post, Server};
+use axum::{routing::post, Router, Server};
 use tokio::sync::RwLock;
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
@@ -42,8 +42,9 @@ pub async fn serve(
             AllowOrigin::any(),
         );
 
-    let app = make_router()
+    let app = Router::new()
         .route("/login", post(auth::login))
+        .nest("/actions", make_router())
         .layer(cors)
         .with_state(Arc::new(RwLock::new(
             State::init(StateInit {
