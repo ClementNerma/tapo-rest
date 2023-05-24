@@ -137,7 +137,7 @@ routes! {
         }
     }
 
-    L530, L630 {
+    L530, L630, L900 {
         async fn on(&state, &client) -> () {
             client.on().await.map_err(Into::into)
         }

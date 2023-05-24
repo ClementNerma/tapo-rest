@@ -17,6 +17,7 @@ pub enum TapoDeviceInner {
     L530(ColorLightHandler<Authenticated>),
     L610(LightHandler<Authenticated>),
     L630(ColorLightHandler<Authenticated>),
+    L900(ColorLightHandler<Authenticated>),
 }
 
 impl TapoDevice {
@@ -71,6 +72,15 @@ impl TapoDevice {
                         })?;
 
                     TapoDeviceInner::L630(auth)
+                }
+
+                TapoDeviceType::L900 => {
+                    let auth =
+                        tapo_client.l900().login().await.with_context(|| {
+                            format!("Failed to login against L900 bulb '{name}'")
+                        })?;
+
+                    TapoDeviceInner::L900(auth)
                 }
             };
 
