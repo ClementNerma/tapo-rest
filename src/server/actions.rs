@@ -1,5 +1,5 @@
 macro_rules! routes {
-    (use { $($prelude:item)* }
+    (use mod { $($prelude:item)* }
      $($device_name:ident {
         $(async fn $action_name:ident(&$state_var:ident, &$client_var:ident $(,$param_name:ident : $param_type:ty)*) -> $ret_type:ty $fn_inner:block)+
     })+) => {
@@ -88,27 +88,45 @@ macro_rules! routes {
 }
 
 routes! {
-    use {}
+    use mod {
+        pub use axum::Json;
+        pub use tapo::{
+            requests::Color,
+            responses::{L530DeviceInfoResult, DeviceUsageResult}
+        };
+    }
 
     L530 {
         async fn on(&state, &client) -> () {
-            client.on().await?;
-            Ok(())
+            client.on().await.map_err(Into::into)
         }
 
         async fn off(&state, &client) -> () {
-            client.off().await?;
-            Ok(())
+            client.off().await.map_err(Into::into)
         }
 
         async fn set_brightness(&state, &client, level: u8) -> () {
-            client.set_brightness(level).await?;
-            Ok(())
+            client.set_brightness(level).await.map_err(Into::into)
         }
 
-        async fn set_color(&state, &client, color: tapo::requests::Color) -> () {
-            client.set_color(color).await?;
-            Ok(())
+        async fn set_color(&state, &client, color: Color) -> () {
+            client.set_color(color).await.map_err(Into::into)
+        }
+
+        async fn set_hue_saturation(&state, &client, hue: u16, saturation: u8) -> () {
+            client.set_hue_saturation(hue, saturation).await.map_err(Into::into)
+        }
+
+        async fn set_color_temperature(&state, &client, color_temperature: u16) -> () {
+            client.set_color_temperature(color_temperature).await.map_err(Into::into)
+        }
+
+        async fn get_device_info(&state, &client) -> Json<L530DeviceInfoResult> {
+            Ok(Json(client.get_device_info().await?))
+        }
+
+        async fn get_device_usage(&state, &client) -> Json<DeviceUsageResult> {
+            Ok(Json(client.get_device_usage().await?))
         }
     }
 }
