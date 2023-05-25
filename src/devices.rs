@@ -95,7 +95,7 @@ impl TapoDevice {
                 TapoDeviceType::L920 => {
                     let auth =
                         tapo_client.l920().login().await.with_context(|| {
-                            format!("Failed to login against L920 bulb '{name}'")
+                            format!("Failed to login against L920 strip '{name}'")
                         })?;
 
                     TapoDeviceInner::L920(auth)
@@ -104,7 +104,7 @@ impl TapoDevice {
                 TapoDeviceType::L930 => {
                     let auth =
                         tapo_client.l930().login().await.with_context(|| {
-                            format!("Failed to login against L930 bulb '{name}'")
+                            format!("Failed to login against L930 strip '{name}'")
                         })?;
 
                     TapoDeviceInner::L930(auth)
@@ -113,7 +113,7 @@ impl TapoDevice {
                 TapoDeviceType::P100 => {
                     let auth =
                         tapo_client.p100().login().await.with_context(|| {
-                            format!("Failed to login against P100 bulb '{name}'")
+                            format!("Failed to login against P100 plug '{name}'")
                         })?;
 
                     TapoDeviceInner::P100(auth)
@@ -122,7 +122,7 @@ impl TapoDevice {
                 TapoDeviceType::P105 => {
                     let auth =
                         tapo_client.p105().login().await.with_context(|| {
-                            format!("Failed to login against P105 bulb '{name}'")
+                            format!("Failed to login against P105 plug '{name}'")
                         })?;
 
                     TapoDeviceInner::P105(auth)
@@ -131,7 +131,7 @@ impl TapoDevice {
                 TapoDeviceType::P110 => {
                     let auth =
                         tapo_client.p110().login().await.with_context(|| {
-                            format!("Failed to login against P110 bulb '{name}'")
+                            format!("Failed to login against P110 plug '{name}'")
                         })?;
 
                     TapoDeviceInner::P110(auth)
@@ -140,7 +140,7 @@ impl TapoDevice {
                 TapoDeviceType::P115 => {
                     let auth =
                         tapo_client.p115().login().await.with_context(|| {
-                            format!("Failed to login against P115 bulb '{name}'")
+                            format!("Failed to login against P115 plug '{name}'")
                         })?;
 
                     TapoDeviceInner::P115(auth)
