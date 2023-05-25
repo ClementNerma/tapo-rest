@@ -111,7 +111,7 @@ routes! {
         pub use axum::Json;
         pub use tapo::{
             requests::{Color, LightingEffectPreset},
-            responses::{L510DeviceInfoResult, L530DeviceInfoResult, L930DeviceInfoResult, DeviceUsageResult}
+            responses::{L510DeviceInfoResult, L530DeviceInfoResult, L930DeviceInfoResult, PlugDeviceInfoResult, DeviceUsageResult}
         };
     }
 
@@ -201,6 +201,24 @@ routes! {
         }
 
         async fn get_device_info(&state, &client) -> Json<L930DeviceInfoResult> {
+            Ok(Json(client.get_device_info().await?))
+        }
+
+        async fn get_device_usage(&state, &client) -> Json<DeviceUsageResult> {
+            Ok(Json(client.get_device_usage().await?))
+        }
+    }
+
+    P100, P105 {
+        async fn on(&state, &client) -> () {
+            client.on().await.map_err(Into::into)
+        }
+
+        async fn off(&state, &client) -> () {
+            client.off().await.map_err(Into::into)
+        }
+
+        async fn get_device_info(&state, &client) -> Json<PlugDeviceInfoResult> {
             Ok(Json(client.get_device_info().await?))
         }
 
