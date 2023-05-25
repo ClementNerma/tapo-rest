@@ -1379,6 +1379,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tapo",
+ "time",
  "tokio",
  "tower-http",
 ]

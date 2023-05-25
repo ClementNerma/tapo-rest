@@ -1,6 +1,7 @@
 use anyhow::{Context, Result};
 use tapo::{
-    ApiClient, Authenticated, ColorLightHandler, ColorLightStripHandler, LightHandler, PlugHandler,
+    ApiClient, Authenticated, ColorLightHandler, ColorLightStripHandler,
+    EnergyMonitoringPlugHandler, LightHandler, PlugHandler,
 };
 
 use crate::{
@@ -24,6 +25,8 @@ pub enum TapoDeviceInner {
     L930(ColorLightStripHandler<Authenticated>),
     P100(PlugHandler<Authenticated>),
     P105(PlugHandler<Authenticated>),
+    P110(EnergyMonitoringPlugHandler<Authenticated>),
+    P115(EnergyMonitoringPlugHandler<Authenticated>),
 }
 
 impl TapoDevice {
@@ -123,6 +126,24 @@ impl TapoDevice {
                         })?;
 
                     TapoDeviceInner::P105(auth)
+                }
+
+                TapoDeviceType::P110 => {
+                    let auth =
+                        tapo_client.p110().login().await.with_context(|| {
+                            format!("Failed to login against P110 bulb '{name}'")
+                        })?;
+
+                    TapoDeviceInner::P110(auth)
+                }
+
+                TapoDeviceType::P115 => {
+                    let auth =
+                        tapo_client.p115().login().await.with_context(|| {
+                            format!("Failed to login against P115 bulb '{name}'")
+                        })?;
+
+                    TapoDeviceInner::P115(auth)
                 }
             };
 

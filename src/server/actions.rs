@@ -110,9 +110,18 @@ routes! {
     use mod {
         pub use axum::Json;
         pub use tapo::{
-            requests::{Color, LightingEffectPreset},
-            responses::{L510DeviceInfoResult, L530DeviceInfoResult, L930DeviceInfoResult, PlugDeviceInfoResult, DeviceUsageResult}
+            requests::{Color, LightingEffectPreset, EnergyDataInterval},
+            responses::{
+                L510DeviceInfoResult,
+                L530DeviceInfoResult,
+                L930DeviceInfoResult,
+                PlugDeviceInfoResult,
+                DeviceUsageResult,
+                EnergyUsageResult,
+                EnergyDataResult
+            }
         };
+        pub use time::{Date, OffsetDateTime};
     }
 
     L510, L610 {
@@ -224,6 +233,40 @@ routes! {
 
         async fn get_device_usage(&state, &client) -> Json<DeviceUsageResult> {
             Ok(Json(client.get_device_usage().await?))
+        }
+    }
+
+    P110, P115 {
+        async fn on(&state, &client) -> () {
+            client.on().await.map_err(Into::into)
+        }
+
+        async fn off(&state, &client) -> () {
+            client.off().await.map_err(Into::into)
+        }
+
+        async fn get_device_info(&state, &client) -> Json<PlugDeviceInfoResult> {
+            Ok(Json(client.get_device_info().await?))
+        }
+
+        async fn get_device_usage(&state, &client) -> Json<DeviceUsageResult> {
+            Ok(Json(client.get_device_usage().await?))
+        }
+
+        async fn get_energy_usage(&state, &client) -> Json<EnergyUsageResult> {
+            Ok(Json(client.get_energy_usage().await?))
+        }
+
+        async fn get_hourly_energy_data(&state, &client, from: OffsetDateTime, to: OffsetDateTime) -> Json<EnergyDataResult> {
+            Ok(Json(client.get_energy_data(EnergyDataInterval::Hourly { start_datetime: from, end_datetime: to }).await?))
+        }
+
+        async fn get_daily_energy_data(&state, &client, quarter_start_date: Date) -> Json<EnergyDataResult> {
+            Ok(Json(client.get_energy_data(EnergyDataInterval::Daily { start_date: quarter_start_date }).await?))
+        }
+
+        async fn get_monthly_energy_data(&state, &client, year_start_date: Date) -> Json<EnergyDataResult> {
+            Ok(Json(client.get_energy_data(EnergyDataInterval::Monthly { start_date: year_start_date }).await?))
         }
     }
 }
