@@ -6,6 +6,12 @@ It is based on the [unofficial Tapo API](https://crates.io/crates/tapo).
 
 ## Usage
 
+Install this program with:
+
+```shell
+cargo install --git https://github.com/ClementNerma/tapo-rest
+```
+
 Create a JSON config file (anywhere) with the follownig structure:
 
 ```json
