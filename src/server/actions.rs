@@ -54,8 +54,23 @@ macro_rules! routes {
                 devices::TapoDeviceInner
             };
 
+            macro_rules! validate_client_type {
+                ($client: expr) => {
+                    match $client {
+                        TapoDeviceInner::$device_name(client) => Some(client),
+                        $( TapoDeviceInner::$alias_device_name(client) => Some(client), )*
+                        _ => None
+                    }
+                }
+            }
+
             #[allow(unused_imports)]
             use super::prelude::*;
+
+            static DEVICE_NAME: [&str; 1 $(+ { stringify!($alias_device_name); 1 })*] = [
+                stringify!($device_name),
+                $( stringify!($alias_device_name) ),*
+            ];
 
             $(
                 paste! {
@@ -89,10 +104,19 @@ macro_rules! routes {
                         "Provided device name was not found",
                     ))?;
 
-                    let client = match &device.inner {
-                        TapoDeviceInner::$device_name(client) => client,
-                        _ => return Err(ApiError::new(StatusCode::BAD_REQUEST, format!("This route is reserved to '{}' devices", stringify!($device_name))))
-                    };
+                    let client = validate_client_type!(&device.inner).ok_or_else(|| {
+                        ApiError::new(
+                            StatusCode::BAD_REQUEST,
+                            format!(
+                                "This route is reserved to '{}' devices",
+                                DEVICE_NAME
+                                    .iter()
+                                    .map(|name| format!("'{name}'"))
+                                    .collect::<Vec<_>>()
+                                    .join(", ")
+                            )
+                        )
+                    })?;
 
                     #[allow(unused_variables)]
                     let $state_var = &state;
