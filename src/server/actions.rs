@@ -6,6 +6,7 @@ macro_rules! routes {
         use axum::routing::{get, Router};
         use serde::{Serialize, Deserialize};
         use super::SharedState;
+        use crate::devices::TapoDeviceInner;
 
         mod prelude {
             $( $prelude )*
@@ -17,6 +18,14 @@ macro_rules! routes {
                 $device_name,
                 $( $alias_device_name, )*
             )+
+        }
+
+        impl TapoDeviceType {
+            pub fn get_type(from: &TapoDeviceInner) -> Self {
+                match from {
+                    $( TapoDeviceInner::$device_name(_) $( | TapoDeviceInner::$alias_device_name(_) )* => Self::$device_name, )+
+                }
+            }
         }
 
         pub fn make_router() -> Router<SharedState> {
@@ -50,7 +59,7 @@ macro_rules! routes {
                 TypedHeader
             };
             use crate::{
-                server::{ApiResult, ApiError, SharedState},
+                server::{ApiResult, ApiError, SharedState, auth::auth},
                 devices::TapoDeviceInner
             };
 
@@ -82,7 +91,7 @@ macro_rules! routes {
                 }
 
                 pub(super) async fn $action_name(
-                    TypedHeader(auth_header): TypedHeader<Authorization<Bearer>>,
+                    auth_header: TypedHeader<Authorization<Bearer>>,
                     Query(query): Query<paste! { [<$action_name:camel Params>] }>,
                     State(state): State<SharedState>
                 ) -> ApiResult<$ret_type> {
@@ -90,12 +99,7 @@ macro_rules! routes {
 
                     let state = state.read().await;
 
-                    let session_id = auth_header.0.token();
-
-                    let _ = state
-                        .sessions
-                        .get(session_id)
-                        .ok_or(ApiError::new(StatusCode::FORBIDDEN, "Invalid bearer token"))?;
+                    auth(auth_header, &state.sessions).await?;
 
                     // TODO: session expiration, etc.?
 

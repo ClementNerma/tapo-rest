@@ -64,7 +64,7 @@ impl Sessions {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Session {
     // TODO: permissions? only access to specific bulbs, etc.?
 }

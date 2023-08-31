@@ -1,9 +1,17 @@
-use axum::{extract::State, http::StatusCode, Json};
+use axum::{
+    extract::State,
+    headers::{authorization::Bearer, Authorization},
+    http::StatusCode,
+    Json, TypedHeader,
+};
 use serde::Deserialize;
 
 use crate::server::SharedState;
 
-use super::{ApiError, ApiResult};
+use super::{
+    sessions::{Session, Sessions},
+    ApiError, ApiResult,
+};
 
 #[derive(Deserialize)]
 pub struct LoginData {
@@ -27,4 +35,15 @@ pub async fn login(
     let session_id = state.sessions.insert().await?;
 
     Ok(session_id)
+}
+
+pub async fn auth(
+    TypedHeader(auth_header): TypedHeader<Authorization<Bearer>>,
+    sessions: &Sessions,
+) -> ApiResult<&Session> {
+    let session_id = auth_header.0.token();
+
+    sessions
+        .get(session_id)
+        .ok_or(ApiError::new(StatusCode::FORBIDDEN, "Invalid bearer token"))
 }

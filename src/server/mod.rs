@@ -1,7 +1,10 @@
 use std::{path::PathBuf, sync::Arc};
 
 use anyhow::Result;
-use axum::{routing::post, Router, Server};
+use axum::{
+    routing::{get, post},
+    Router, Server,
+};
 use tokio::sync::RwLock;
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
@@ -15,6 +18,7 @@ use self::state::State;
 
 mod actions;
 mod auth;
+mod discovery;
 mod errors;
 mod sessions;
 mod state;
@@ -45,6 +49,7 @@ pub async fn serve(
 
     let app = Router::new()
         .route("/login", post(auth::login))
+        .route("/discover", get(discovery::discover_devices))
         .nest("/actions", make_router())
         .layer(cors)
         .with_state(Arc::new(RwLock::new(
