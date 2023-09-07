@@ -53,7 +53,7 @@ async fn main() -> Result<()> {
     let mut tasks = JoinSet::new();
 
     println!(
-        "| Attempting to connect to the {} configured devices...",
+        "| Attempting to connect to the {} configured device(s)...",
         devices.len()
     );
 
