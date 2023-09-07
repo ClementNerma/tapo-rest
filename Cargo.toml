@@ -18,7 +18,7 @@ clap = { version = "4.3.0", features = ["derive"] }
 rand = "0.8.5"
 serde = { version = "1.0.163", features = ["derive"] }
 serde_json = "1.0.96"
-tapo = { git = "https://github.com/ClementNerma/tapo.git" }
+tapo = "0.7.2"
 tokio = { version = "1.28.1", features = ["macros", "rt-multi-thread", "fs"] }
 tower-http = { version = "0.4.0", features = ["cors"] }
 openssl = { version = "0.10", features = ["vendored"] }

@@ -422,6 +422,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "either"
+version = "1.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a26ae43d7bcc3b814de94796a5e736d4029efb0ee900c12e2d54c993ad1a1e07"
+
+[[package]]
 name = "encoding_rs"
 version = "0.8.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -828,6 +834,15 @@ dependencies = [
  "tracing-futures",
  "url",
  "waker-fn",
+]
+
+[[package]]
+name = "itertools"
+version = "0.10.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
+dependencies = [
+ "either",
 ]
 
 [[package]]
@@ -1346,14 +1361,16 @@ checksum = "2047c6ded9c721764247e62cd3b03c09ffc529b2ba5b10ec482ae507a4a70160"
 
 [[package]]
 name = "tapo"
-version = "0.6.0"
-source = "git+https://github.com/ClementNerma/tapo.git#093e458de845d3d5139b4c5f440e869654df7cd9"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a098387b8c50db8300772e65934d973a0636efe7f48529cc2f4f36409e6eb121"
 dependencies = [
  "anyhow",
  "async-trait",
  "base16ct",
  "base64 0.21.1",
  "isahc",
+ "itertools",
  "lazy_static",
  "log",
  "openssl",

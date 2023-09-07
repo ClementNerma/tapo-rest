@@ -1,4 +1,4 @@
-use std::net::Ipv4Addr;
+use std::net::IpAddr;
 
 use serde::{Deserialize, Serialize};
 
@@ -20,5 +20,5 @@ pub struct TapoCredentials {
 pub struct TapoConnectionInfos {
     pub name: String,
     pub device_type: TapoDeviceType,
-    pub ip_addr: Ipv4Addr,
+    pub ip_addr: IpAddr,
 }
