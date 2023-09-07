@@ -1,7 +1,7 @@
 macro_rules! routes {
     (use mod { $($prelude:item)* }
      $($device_name:ident $(,$alias_device_name:ident)* {
-        $(async fn $action_name:ident(&$state_var:ident, &$client_var:ident $(,$param_name:ident : $param_type:ty)*) -> $ret_type:ty $fn_inner:block)+
+        $(async fn $action_name:ident(&$state_var:ident, &$client_var:ident $(,$(#[$param_meta:meta])? $param_name:ident : $param_type:ty)*) -> $ret_type:ty $fn_inner:block)+
     })+) => {
         use axum::routing::{get, Router};
         use serde::{Serialize, Deserialize};
@@ -86,7 +86,7 @@ macro_rules! routes {
                     #[derive(Deserialize)]
                     pub struct [<$action_name:camel Params>] {
                         device: String,
-                        $( $param_name: $param_type ),*
+                        $( $(#[$param_meta])? $param_name: $param_type ),*
                     }
                 }
 
@@ -285,7 +285,13 @@ routes! {
             Ok(Json(client.get_energy_usage().await?))
         }
 
-        async fn get_hourly_energy_data(&state, &client, from: OffsetDateTime, to: OffsetDateTime) -> Json<EnergyDataResult> {
+        async fn get_hourly_energy_data(
+            &state,
+            &client,
+
+            #[serde(with = "time::serde::rfc3339")] from: OffsetDateTime,
+            #[serde(with = "time::serde::rfc3339")] to: OffsetDateTime
+        ) -> Json<EnergyDataResult> {
             Ok(Json(client.get_energy_data(EnergyDataInterval::Hourly { start_datetime: from, end_datetime: to }).await?))
         }
 
