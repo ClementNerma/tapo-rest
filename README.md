@@ -80,4 +80,4 @@ curl -i -X GET -H 'Authorization: Bearer <your session ID>' 'http://localhost:80
 
 ## Query parameters
 
-Some routes (such as `get-hourly-usage`) require timestamps. These must be provided in RFC 3339 format (e.g. `2023-09-07T07:05:06.402Z`).
+Some routes (such as `get-hourly-usage`) require timestamps. These must be provided in RFC 3339 format (e.g. `+2023-12-31`).
