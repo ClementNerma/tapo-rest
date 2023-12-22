@@ -1,7 +1,7 @@
-use axum::{
-    extract::State,
+use axum::{extract::State, Json};
+use axum_extra::{
     headers::{authorization::Bearer, Authorization},
-    Json, TypedHeader,
+    TypedHeader,
 };
 use serde::Serialize;
 

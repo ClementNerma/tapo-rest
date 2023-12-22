@@ -1,8 +1,7 @@
-use axum::{
-    extract::State,
+use axum::{extract::State, http::StatusCode, Json};
+use axum_extra::{
     headers::{authorization::Bearer, Authorization},
-    http::StatusCode,
-    Json, TypedHeader,
+    TypedHeader,
 };
 use serde::Deserialize;
 

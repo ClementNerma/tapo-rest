@@ -54,8 +54,10 @@ macro_rules! routes {
             use serde::Deserialize;
             use axum::{
                 extract::{Query, State},
-                headers::{authorization::Bearer, Authorization},
                 http::StatusCode,
+            };
+            use axum_extra::{
+                headers::{authorization::Bearer, Authorization},
                 TypedHeader
             };
             use crate::{
@@ -140,16 +142,17 @@ routes! {
         pub use tapo::{
             requests::{Color, LightingEffectPreset, EnergyDataInterval},
             responses::{
-                L510DeviceInfoResult,
-                L530DeviceInfoResult,
-                L930DeviceInfoResult,
-                PlugDeviceInfoResult,
+                DeviceInfoLightResult,
+                DeviceInfoColorLightResult,
+                DeviceUsageEnergyMonitoringResult,
+                DeviceInfoColorLightStripResult,
+                DeviceInfoPlugResult,
                 DeviceUsageResult,
                 EnergyUsageResult,
                 EnergyDataResult
             }
         };
-        pub use time::{Date, OffsetDateTime};
+        pub use chrono::NaiveDate;
     }
 
     L510, L610 {
@@ -165,11 +168,11 @@ routes! {
             client.set_brightness(level).await.map_err(Into::into)
         }
 
-        async fn get_device_info(&state, &client) -> Json<L510DeviceInfoResult> {
+        async fn get_device_info(&state, &client) -> Json<DeviceInfoLightResult> {
             Ok(Json(client.get_device_info().await?))
         }
 
-        async fn get_device_usage(&state, &client) -> Json<DeviceUsageResult> {
+        async fn get_device_usage(&state, &client) -> Json<DeviceUsageEnergyMonitoringResult> {
             Ok(Json(client.get_device_usage().await?))
         }
     }
@@ -199,11 +202,11 @@ routes! {
             client.set_color_temperature(color_temperature).await.map_err(Into::into)
         }
 
-        async fn get_device_info(&state, &client) -> Json<L530DeviceInfoResult> {
+        async fn get_device_info(&state, &client) -> Json<DeviceInfoColorLightResult> {
             Ok(Json(client.get_device_info().await?))
         }
 
-        async fn get_device_usage(&state, &client) -> Json<DeviceUsageResult> {
+        async fn get_device_usage(&state, &client) -> Json<DeviceUsageEnergyMonitoringResult> {
             Ok(Json(client.get_device_usage().await?))
         }
     }
@@ -237,11 +240,11 @@ routes! {
             client.set_lighting_effect(lighting_effect).await.map_err(Into::into)
         }
 
-        async fn get_device_info(&state, &client) -> Json<L930DeviceInfoResult> {
+        async fn get_device_info(&state, &client) -> Json<DeviceInfoColorLightStripResult> {
             Ok(Json(client.get_device_info().await?))
         }
 
-        async fn get_device_usage(&state, &client) -> Json<DeviceUsageResult> {
+        async fn get_device_usage(&state, &client) -> Json<DeviceUsageEnergyMonitoringResult> {
             Ok(Json(client.get_device_usage().await?))
         }
     }
@@ -255,7 +258,7 @@ routes! {
             client.off().await.map_err(Into::into)
         }
 
-        async fn get_device_info(&state, &client) -> Json<PlugDeviceInfoResult> {
+        async fn get_device_info(&state, &client) -> Json<DeviceInfoPlugResult> {
             Ok(Json(client.get_device_info().await?))
         }
 
@@ -273,11 +276,11 @@ routes! {
             client.off().await.map_err(Into::into)
         }
 
-        async fn get_device_info(&state, &client) -> Json<PlugDeviceInfoResult> {
+        async fn get_device_info(&state, &client) -> Json<DeviceInfoPlugResult> {
             Ok(Json(client.get_device_info().await?))
         }
 
-        async fn get_device_usage(&state, &client) -> Json<DeviceUsageResult> {
+        async fn get_device_usage(&state, &client) -> Json<DeviceUsageEnergyMonitoringResult> {
             Ok(Json(client.get_device_usage().await?))
         }
 
@@ -285,22 +288,16 @@ routes! {
             Ok(Json(client.get_energy_usage().await?))
         }
 
-        async fn get_hourly_energy_data(
-            &state,
-            &client,
-
-            #[serde(with = "time::serde::rfc3339")] from: OffsetDateTime,
-            #[serde(with = "time::serde::rfc3339")] to: OffsetDateTime
-        ) -> Json<EnergyDataResult> {
-            Ok(Json(client.get_energy_data(EnergyDataInterval::Hourly { start_datetime: from, end_datetime: to }).await?))
+        async fn get_hourly_energy_data(&state, &client, start_date: NaiveDate, end_date: NaiveDate) -> Json<EnergyDataResult> {
+            Ok(Json(client.get_energy_data(EnergyDataInterval::Hourly { start_date, end_date }).await?))
         }
 
-        async fn get_daily_energy_data(&state, &client, quarter_start_date: Date) -> Json<EnergyDataResult> {
-            Ok(Json(client.get_energy_data(EnergyDataInterval::Daily { start_date: quarter_start_date }).await?))
+        async fn get_daily_energy_data(&state, &client, start_date: NaiveDate) -> Json<EnergyDataResult> {
+            Ok(Json(client.get_energy_data(EnergyDataInterval::Daily { start_date }).await?))
         }
 
-        async fn get_monthly_energy_data(&state, &client, year_start_date: Date) -> Json<EnergyDataResult> {
-            Ok(Json(client.get_energy_data(EnergyDataInterval::Monthly { start_date: year_start_date }).await?))
+        async fn get_monthly_energy_data(&state, &client, start_date: NaiveDate) -> Json<EnergyDataResult> {
+            Ok(Json(client.get_energy_data(EnergyDataInterval::Monthly { start_date }).await?))
         }
     }
 }

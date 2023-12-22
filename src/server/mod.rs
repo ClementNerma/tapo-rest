@@ -3,9 +3,9 @@ use std::{path::PathBuf, sync::Arc};
 use anyhow::Result;
 use axum::{
     routing::{get, post},
-    Router, Server,
+    Router,
 };
-use tokio::sync::RwLock;
+use tokio::{net::TcpListener, sync::RwLock};
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
 use crate::{
@@ -62,12 +62,13 @@ pub async fn serve(
             .await?,
         )));
 
-    let addr = format!("0.0.0.0:{port}").parse().unwrap();
+    let addr = format!("0.0.0.0:{port}");
 
     println!("Launching server on {addr}...");
 
-    Server::bind(&addr)
-        .serve(app.into_make_service())
+    let tcp_listener = TcpListener::bind(addr).await?;
+
+    axum::serve(tcp_listener, app.into_make_service())
         .await
         .map_err(Into::into)
 }

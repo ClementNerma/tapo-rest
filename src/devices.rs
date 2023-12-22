@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
 use tapo::{
-    ApiClient, ColorLightHandler, ColorLightStripHandler, EnergyMonitoringPlugHandler,
-    LightHandler, PlugHandler,
+    ApiClient, ColorLightHandler, ColorLightStripHandler, LightHandler,
+    PlugEnergyMonitoringHandler, PlugHandler,
 };
 
 use crate::{
@@ -25,8 +25,8 @@ pub enum TapoDeviceInner {
     L930(ColorLightStripHandler),
     P100(PlugHandler),
     P105(PlugHandler),
-    P110(EnergyMonitoringPlugHandler),
-    P115(EnergyMonitoringPlugHandler),
+    P110(PlugEnergyMonitoringHandler),
+    P115(PlugEnergyMonitoringHandler),
 }
 
 impl TapoDevice {
