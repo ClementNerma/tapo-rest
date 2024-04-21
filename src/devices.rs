@@ -11,7 +11,7 @@ use crate::{
 
 pub struct TapoDevice {
     pub name: String,
-    pub conn_infos: TapoConnectionInfos,
+    // pub conn_infos: TapoConnectionInfos,
     pub inner: TapoDeviceInner,
 }
 
@@ -148,7 +148,7 @@ impl TapoDevice {
 
         Ok(Self {
             name: name.to_string(),
-            conn_infos,
+            // conn_infos,
             inner,
         })
     }
