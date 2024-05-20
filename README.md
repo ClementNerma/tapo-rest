@@ -1,18 +1,16 @@
 # Unofficial Tapo REST Api
 
-This program exposes a REST API to control your Tapo devices (light bulbs, strips, plugs, etc.)
+This program exposes a REST API to control your Tapo devices (light bulbs, strips, plugs, etc.). It is **NOT** affiliated in any way with the Tapo or TP-Link brands and is only made as a best-effort for personal use.
 
 It is based on the [unofficial Tapo API](https://crates.io/crates/tapo).
 
+If you have any issue with this program, please [open an issue](https://github.com/ClementNerma/tapo-rest/issues/new)!
+
 ## Usage
 
-Install this program with:
+Start by downloading a prebuilt binary from the [latest release](https://github.com/ClementNerma/tapo-rest/releases/latest) and copying it to a folder in your PATH.
 
-```shell
-cargo install --git https://github.com/ClementNerma/tapo-rest
-```
-
-Create a JSON config file (anywhere) with the follownig structure:
+Then create a JSON config file (anywhere) with the follownig structure:
 
 ```json
 {
