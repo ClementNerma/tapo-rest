@@ -144,9 +144,10 @@ routes! {
             responses::{
                 DeviceInfoLightResult,
                 DeviceInfoColorLightResult,
-                DeviceUsageEnergyMonitoringResult,
-                DeviceInfoColorLightStripResult,
+                DeviceInfoRgbLightStripResult,
+                DeviceInfoRgbicLightStripResult,
                 DeviceInfoPlugResult,
+                DeviceUsageEnergyMonitoringResult,
                 DeviceUsageResult,
                 EnergyUsageResult,
                 EnergyDataResult
@@ -177,7 +178,7 @@ routes! {
         }
     }
 
-    L530, L630, L900 {
+    L530, L630 {
         async fn on(&state, &client) -> () {
             client.on().await.map_err(Into::into)
         }
@@ -203,6 +204,40 @@ routes! {
         }
 
         async fn get_device_info(&state, &client) -> Json<DeviceInfoColorLightResult> {
+            Ok(Json(client.get_device_info().await?))
+        }
+
+        async fn get_device_usage(&state, &client) -> Json<DeviceUsageEnergyMonitoringResult> {
+            Ok(Json(client.get_device_usage().await?))
+        }
+    }
+
+    L900 {
+        async fn on(&state, &client) -> () {
+            client.on().await.map_err(Into::into)
+        }
+
+        async fn off(&state, &client) -> () {
+            client.off().await.map_err(Into::into)
+        }
+
+        async fn set_brightness(&state, &client, level: u8) -> () {
+            client.set_brightness(level).await.map_err(Into::into)
+        }
+
+        async fn set_color(&state, &client, color: Color) -> () {
+            client.set_color(color).await.map_err(Into::into)
+        }
+
+        async fn set_hue_saturation(&state, &client, hue: u16, saturation: u8) -> () {
+            client.set_hue_saturation(hue, saturation).await.map_err(Into::into)
+        }
+
+        async fn set_color_temperature(&state, &client, color_temperature: u16) -> () {
+            client.set_color_temperature(color_temperature).await.map_err(Into::into)
+        }
+
+        async fn get_device_info(&state, &client) -> Json<DeviceInfoRgbLightStripResult> {
             Ok(Json(client.get_device_info().await?))
         }
 
@@ -240,7 +275,7 @@ routes! {
             client.set_lighting_effect(lighting_effect).await.map_err(Into::into)
         }
 
-        async fn get_device_info(&state, &client) -> Json<DeviceInfoColorLightStripResult> {
+        async fn get_device_info(&state, &client) -> Json<DeviceInfoRgbicLightStripResult> {
             Ok(Json(client.get_device_info().await?))
         }
 
