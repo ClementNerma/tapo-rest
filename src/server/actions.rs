@@ -142,6 +142,7 @@ routes! {
         pub use tapo::{
             requests::{Color, LightingEffectPreset, EnergyDataInterval},
             responses::{
+                CurrentPowerResult,
                 DeviceInfoLightResult,
                 DeviceInfoColorLightResult,
                 DeviceInfoRgbLightStripResult,
@@ -333,6 +334,10 @@ routes! {
 
         async fn get_monthly_energy_data(&state, &client, start_date: NaiveDate) -> Json<EnergyDataResult> {
             Ok(Json(client.get_energy_data(EnergyDataInterval::Monthly { start_date }).await?))
+        }
+
+        async fn get_current_power(&state, &client) -> Json<CurrentPowerResult> {
+            Ok(Json(client.get_current_power().await?))
         }
     }
 }
