@@ -148,6 +148,7 @@ routes! {
                 DeviceInfoRgbLightStripResult,
                 DeviceInfoRgbicLightStripResult,
                 DeviceInfoPlugResult,
+                DeviceInfoPlugEnergyMonitoringResult,
                 DeviceUsageEnergyMonitoringResult,
                 DeviceUsageResult,
                 EnergyUsageResult,
@@ -312,7 +313,7 @@ routes! {
             client.off().await.map_err(Into::into)
         }
 
-        async fn get_device_info(&state, &client) -> Json<DeviceInfoPlugResult> {
+        async fn get_device_info(&state, &client) -> Json<DeviceInfoPlugEnergyMonitoringResult> {
             Ok(Json(client.get_device_info().await?))
         }
 
