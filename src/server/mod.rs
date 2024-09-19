@@ -1,6 +1,6 @@
-use std::{path::PathBuf, sync::Arc};
+use std::{fs, path::PathBuf, sync::Arc};
 
-use anyhow::Result;
+use anyhow::{bail, Context, Result};
 use axum::{
     routing::{get, post},
     Router,
@@ -9,7 +9,7 @@ use tokio::{net::TcpListener, sync::RwLock};
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
 use crate::{
-    cmd::ServerConfig,
+    cmd::{PasswordArgGroup, ServerConfig},
     devices::TapoDevice,
     server::{actions::make_router, state::StateInit},
 };
@@ -34,10 +34,31 @@ pub async fn serve(
     devices: Vec<TapoDevice>,
     sessions_file: PathBuf,
 ) -> Result<()> {
-    let ServerConfig {
-        port,
+    let ServerConfig { port, password } = config;
+
+    let PasswordArgGroup {
         auth_password,
-    } = config;
+        password_from_file,
+    } = password;
+
+    let auth_password = match (auth_password, password_from_file) {
+        (Some(auth_password), None) => auth_password,
+
+        (None, Some(file)) => {
+            if !file.is_file() {
+                bail!(
+                    "Provided file password path does not exist: {}",
+                    file.display()
+                );
+            }
+
+            fs::read_to_string(&file).with_context(|| {
+                format!("Failed to read file password at path: {}", file.display())
+            })?
+        }
+
+        (Some(_), Some(_)) | (None, None) => unreachable!(),
+    };
 
     let cors = CorsLayer::new()
         .allow_methods(AllowMethods::any())

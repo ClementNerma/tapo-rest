@@ -16,6 +16,16 @@ pub struct ServerConfig {
     #[clap(short, long, help = "Port to serve on")]
     pub port: u16,
 
+    #[clap(flatten)]
+    pub password: PasswordArgGroup,
+}
+
+#[derive(Parser)]
+#[group(required = true, multiple = false)]
+pub struct PasswordArgGroup {
     #[clap(short, long, help = "Login password")]
-    pub auth_password: String,
+    pub auth_password: Option<String>,
+
+    #[clap(short = 'f', long, help = "Read the login password from a file")]
+    pub password_from_file: Option<PathBuf>,
 }
