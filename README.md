@@ -37,7 +37,9 @@ The `name` field can be set to whatever name you want.
 The `device_type` field can be any of:
 
 * `L510`
+* `L520`
 * `L530`
+* `L535`
 * `L610`
 * `L630`
 * `L900`
@@ -46,6 +48,7 @@ The `device_type` field can be any of:
 * `P100`
 * `P105`
 * `P110`
+* `P110M`
 * `P115`
 
 You can then run the server with:

@@ -11,13 +11,14 @@ use crate::{
 
 pub struct TapoDevice {
     pub name: String,
-    // pub conn_infos: TapoConnectionInfos,
     pub inner: TapoDeviceInner,
 }
 
 pub enum TapoDeviceInner {
     L510(LightHandler),
+    L520(LightHandler),
     L530(ColorLightHandler),
+    L535(ColorLightHandler),
     L610(LightHandler),
     L630(ColorLightHandler),
     L900(RgbLightStripHandler),
@@ -26,6 +27,7 @@ pub enum TapoDeviceInner {
     P100(PlugHandler),
     P105(PlugHandler),
     P110(PlugEnergyMonitoringHandler),
+    P110M(PlugEnergyMonitoringHandler),
     P115(PlugEnergyMonitoringHandler),
 }
 
@@ -54,12 +56,28 @@ impl TapoDevice {
                     TapoDeviceInner::L510(auth)
                 }
 
+                TapoDeviceType::L520 => {
+                    let auth = tapo_client.l520(ip_addr.to_string()).await.map_err(|err| {
+                        anyhow!("Failed to login into L520 bulb '{name}': {err:?}")
+                    })?;
+
+                    TapoDeviceInner::L520(auth)
+                }
+
                 TapoDeviceType::L530 => {
                     let auth = tapo_client.l530(ip_addr.to_string()).await.map_err(|err| {
                         anyhow!("Failed to login into L530 bulb '{name}': {err:?}")
                     })?;
 
                     TapoDeviceInner::L530(auth)
+                }
+
+                TapoDeviceType::L535 => {
+                    let auth = tapo_client.l535(ip_addr.to_string()).await.map_err(|err| {
+                        anyhow!("Failed to login into L535 bulb '{name}': {err:?}")
+                    })?;
+
+                    TapoDeviceInner::L535(auth)
                 }
 
                 TapoDeviceType::L610 => {
@@ -124,6 +142,15 @@ impl TapoDevice {
                     })?;
 
                     TapoDeviceInner::P110(auth)
+                }
+
+                TapoDeviceType::P110M => {
+                    // P110M is fully compatible with P110
+                    let auth = tapo_client.p110(ip_addr.to_string()).await.map_err(|err| {
+                        anyhow!("Failed to login into P110M plug '{name}': {err:?}")
+                    })?;
+
+                    TapoDeviceInner::P110M(auth)
                 }
 
                 TapoDeviceType::P115 => {

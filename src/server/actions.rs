@@ -158,7 +158,7 @@ routes! {
         pub use chrono::NaiveDate;
     }
 
-    L510, L610 {
+    L510, L520, L610 {
         async fn on(&state, &client) -> () {
             client.on().await.map_err(Into::into)
         }
@@ -180,7 +180,7 @@ routes! {
         }
     }
 
-    L530, L630 {
+    L530, L535, L630 {
         async fn on(&state, &client) -> () {
             client.on().await.map_err(Into::into)
         }
@@ -304,7 +304,7 @@ routes! {
         }
     }
 
-    P110, P115 {
+    P110, P110M, P115 {
         async fn on(&state, &client) -> () {
             client.on().await.map_err(Into::into)
         }
