@@ -4,10 +4,7 @@ use tapo::{
     RgbLightStripHandler, RgbicLightStripHandler,
 };
 
-use crate::{
-    config::{TapoConnectionInfos, TapoCredentials},
-    server::TapoDeviceType,
-};
+use crate::{cmd::TapoCredentials, config::TapoConnectionInfos, server::TapoDeviceType};
 
 pub struct TapoDevice {
     pub name: String,
@@ -42,9 +39,12 @@ impl TapoDevice {
             ip_addr,
         } = &conn_infos;
 
-        let TapoCredentials { username, password } = credentials;
+        let TapoCredentials {
+            tapo_email,
+            tapo_password,
+        } = credentials;
 
-        let tapo_client = ApiClient::new(username, password);
+        let tapo_client = ApiClient::new(tapo_email, tapo_password);
 
         let inner =
             match device_type {

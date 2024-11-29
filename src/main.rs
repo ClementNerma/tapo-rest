@@ -2,6 +2,8 @@
 #![forbid(unused_must_use)]
 #![warn(unused_crate_dependencies)]
 
+use std::sync::Arc;
+
 // OpenSSL is vendored, this instruction is not required
 // but allows to get rind of the "unused external dependency" lint
 use openssl as _;
@@ -23,6 +25,7 @@ mod server;
 async fn main() -> Result<()> {
     let Cmd {
         devices_config_path,
+        tapo_credentials,
         server_config,
     } = Cmd::parse();
 
@@ -47,7 +50,7 @@ async fn main() -> Result<()> {
         .await
         .context("Failed to read the devices configuration file")?;
 
-    let Config { account, devices } = serde_json::from_str(&config_str)
+    let Config { devices } = serde_json::from_str(&config_str)
         .context("Failed to parse the devices configuration file")?;
 
     let mut tasks = JoinSet::new();
@@ -59,9 +62,11 @@ async fn main() -> Result<()> {
 
     let mut remaining = devices.len();
 
+    let tapo_credentials = Arc::new(tapo_credentials);
+
     for conn_infos in devices {
-        let account = account.clone();
-        tasks.spawn(async move { TapoDevice::connect(conn_infos, &account).await });
+        let tapo_credentials = Arc::clone(&tapo_credentials);
+        tasks.spawn(async move { TapoDevice::connect(conn_infos, &tapo_credentials).await });
     }
 
     let mut devices = vec![];

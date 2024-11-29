@@ -10,14 +10,10 @@ If you have any issue with this program, please [open an issue](https://github.c
 
 Start by downloading a prebuilt binary from the [latest release](https://github.com/ClementNerma/tapo-rest/releases/latest) and copying it to a folder in your PATH. Binaries are available for 64-bit Windows (x86) and 64-bit Linux (x86 and aarch64).
 
-Then create a JSON config file (anywhere) with the follownig structure:
+Then create a JSON config file (anywhere) with the following structure:
 
 ```json
 {
-    "account": {
-        "username": "<your tapo account's email>",
-        "password": "<your tapo account's password>"
-    },
     "devices": [
         {
             "name": "living-room-bulb",
@@ -54,7 +50,14 @@ The `device_type` field can be any of:
 You can then run the server with:
 
 ```shell
-cargo run -- --devices-config-path <path to your json file> --port 8000 --auth-password 'potatoes'
+tapo-rest ./path-to-your-json-file.json \
+          --tapo-email '<your tapo account email address>' \
+          --tapo-password '<your tapo account password>'
+          --port 8000 \
+          --auth-password 'potatoes'
+
+# Or you can use environemnt variables!
+TAPO_EMAIL='...' TAPO_PASSWORD='...' PORT='...' AUTH_PASSWORD='...' tapo-rest ./config.json
 ```
 
 This will run the server on `0.0.0.0:8000` (you can chose any port you like) and will require clients to use the `potatoes` password to log in.
