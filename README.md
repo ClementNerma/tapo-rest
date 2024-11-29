@@ -32,20 +32,12 @@ Then create a JSON config file (anywhere) with the following structure:
 The `name` field can be set to whatever name you want.
 The `device_type` field can be any of:
 
-* `L510`
-* `L520`
-* `L530`
-* `L535`
-* `L610`
-* `L630`
-* `L900`
-* `L920`
-* `L930`
-* `P100`
-* `P105`
-* `P110`
-* `P110M`
-* `P115`
+* `L510`, `L520`, `L610` (light bulbs)
+* `L530`, `L535`, `L630` (light bulbs with customizable colors)
+* `L900` (RGB light strips)
+* `L920`, `L930` (RGB light strips with individually colored segments)
+* `P100`, `P105` (smart plugs)
+* `P110`, `P110M`, `P115` (smart plugs with energy monitoring)
 
 You can then run the server with:
 
