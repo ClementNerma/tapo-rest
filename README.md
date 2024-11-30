@@ -42,13 +42,22 @@ The `device_type` field can be any of:
 You can then run the server with:
 
 ```shell
-docker run -it -v ./path-to-your-config.json:/app/devices.json clementnerma/tapo-rest --tapo-email '<your tapo account email address>' --tapo-password '<your tapo account password>' --port 8000 --auth-password 'potatoes'
+docker run -it -v ./path-to-your-config.json:/app/devices.json clementnerma/tapo-rest \
+    --tapo-email '<your tapo account email address>' \
+    --tapo-password '<your tapo account password>' \
+    --port 8000 \
+    --auth-password 'potatoes'
 ```
 
 You can also use environment variables, like this:
 
 ```shell
-docker run -it -v ./config.json:/app/devices.json -e TAPO_EMAIL=... -e TAPO_PASSWORD=... -e PORT=8000 -e AUTH_PASSWORD=... clementnerma/tapo-rest
+docker run -it -v ./config.json:/app/devices.json \
+    -e TAPO_EMAIL=... \
+    -e TAPO_PASSWORD=... \
+    -e PORT=8000 \
+    -e AUTH_PASSWORD=... \
+    clementnerma/tapo-rest
 ```
 
 The prebuilt binary works the same (same flags, same environment variables).
