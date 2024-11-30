@@ -8,7 +8,7 @@ If you have any issue with this program, please [open an issue](https://github.c
 
 ## Usage
 
-You can either use a prebuilt binary from the [latest release](https://github.com/ClementNerma/tapo-rest/releases/latest) and copy it to a folder in your PATH, or use the [docker image](hub.docker.com/r/clementnerma/tapo-rest).
+You can either use a prebuilt binary from the [latest release](https://github.com/ClementNerma/tapo-rest/releases/latest) and copy it to a folder in your PATH, or use the [docker image](https://hub.docker.com/r/clementnerma/tapo-rest).
 
 Start by creating a JSON config file (anywhere) with the following structure:
 
