@@ -325,7 +325,9 @@ routes! {
             Ok(Json(client.get_energy_usage().await?))
         }
 
-        async fn get_hourly_energy_data(&state, &client, start_date: NaiveDate, end_date: NaiveDate) -> Json<EnergyDataResult> {
+        async fn get_hourly_energy_data(&state, &client, start_date: NaiveDate, end_date: Option<NaiveDate>) -> Json<EnergyDataResult> {
+            let end_date = end_date.unwrap_or(start_date);
+
             Ok(Json(client.get_energy_data(EnergyDataInterval::Hourly { start_date, end_date }).await?))
         }
 
