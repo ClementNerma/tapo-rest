@@ -98,21 +98,21 @@ pub async fn serve(
 
 #[derive(Deserialize)]
 struct RefreshDeviceSessionParams {
-    device_name: String,
+    device: String,
 }
 
 async fn refresh_session(
     State(state): State<SharedState>,
     Query(params): Query<RefreshDeviceSessionParams>,
 ) -> ApiResult<()> {
-    let RefreshDeviceSessionParams { device_name } = params;
+    let RefreshDeviceSessionParams { device } = params;
 
     let mut state = state.write().await;
 
     let device = state
         .devices
-        .get_mut(&device_name)
-        .with_context(|| format!("Unkown device: {device_name}"))?;
+        .get_mut(&device)
+        .with_context(|| format!("Unkown device: {device}"))?;
 
     device
         .refresh_session()

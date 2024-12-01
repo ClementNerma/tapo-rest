@@ -92,4 +92,4 @@ Some routes (such as `get-hourly-usage`) require timestamps. These must be provi
 
 Once connected to a Tapo device, a session is maintained between the server and the device. But Tapo devices set an expiration time, which means the session will eventually expire.
 
-If this happens, you can hit the `/refresh-session?device_name=...` route to refresh the session.
+If this happens, you can hit the `/refresh-session?device=...` route to refresh the session.
