@@ -168,4 +168,66 @@ impl TapoDevice {
             inner,
         })
     }
+
+    pub async fn refresh_session(&mut self) -> Result<()> {
+        match &mut self.inner {
+            TapoDeviceInner::L510(device) => {
+                device.refresh_session().await?;
+            }
+
+            TapoDeviceInner::L520(device) => {
+                device.refresh_session().await?;
+            }
+
+            TapoDeviceInner::L530(device) => {
+                device.refresh_session().await?;
+            }
+
+            TapoDeviceInner::L535(device) => {
+                device.refresh_session().await?;
+            }
+
+            TapoDeviceInner::L610(device) => {
+                device.refresh_session().await?;
+            }
+
+            TapoDeviceInner::L630(device) => {
+                device.refresh_session().await?;
+            }
+
+            TapoDeviceInner::L900(device) => {
+                device.refresh_session().await?;
+            }
+
+            TapoDeviceInner::L920(device) => {
+                device.refresh_session().await?;
+            }
+
+            TapoDeviceInner::L930(device) => {
+                device.refresh_session().await?;
+            }
+
+            TapoDeviceInner::P100(device) => {
+                device.refresh_session().await?;
+            }
+
+            TapoDeviceInner::P105(device) => {
+                device.refresh_session().await?;
+            }
+
+            TapoDeviceInner::P110(device) => {
+                device.refresh_session().await?;
+            }
+
+            TapoDeviceInner::P110M(device) => {
+                device.refresh_session().await?;
+            }
+
+            TapoDeviceInner::P115(device) => {
+                device.refresh_session().await?;
+            }
+        }
+
+        Ok(())
+    }
 }
