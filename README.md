@@ -87,3 +87,9 @@ curl -i -X GET -H 'Authorization: Bearer <your session ID>' 'http://localhost:80
 ## Query parameters
 
 Some routes (such as `get-hourly-usage`) require timestamps. These must be provided in RFC 3339 format (e.g. `2023-12-31`).
+
+## Session timeout
+
+Once connected to a Tapo device, a session is maintained between the server and the device. But Tapo devices set an expiration time, which means the session will eventually expire.
+
+If this happens, you can hit the `/refresh-session?device_name=...` route to refresh the session.
