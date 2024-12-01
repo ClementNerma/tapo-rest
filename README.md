@@ -93,3 +93,9 @@ Some routes (such as `get-hourly-usage`) require timestamps. These must be provi
 Once connected to a Tapo device, a session is maintained between the server and the device. But Tapo devices set an expiration time, which means the session will eventually expire.
 
 If this happens, you can hit the `/refresh-session?device=...` route to refresh the session.
+
+## Cinammon applet
+
+[@smiklosovic](https://github.com/smiklosovic) published a [Cinnamon control applet](https://cinnamon-spices.linuxmint.com/applets/view/398).
+
+This applet is entirely done by him, only using tapo-rest as the underlying server.
