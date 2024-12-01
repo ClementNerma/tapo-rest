@@ -12,4 +12,4 @@ FROM alpine
 
 WORKDIR /app
 COPY --from=builder /app/target/release/tapo-rest .
-ENTRYPOINT ["./tapo-rest", "/app/devices.json"]
+ENTRYPOINT ["./tapo-rest", "/app/devices.json", "--port=80"]

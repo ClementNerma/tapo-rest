@@ -43,9 +43,9 @@ You can then run the server with:
 
 ```shell
 docker run -it -v ./path-to-your-config.json:/app/devices.json clementnerma/tapo-rest \
+    -p 8000:80 \
     --tapo-email '<your tapo account email address>' \
     --tapo-password '<your tapo account password>' \
-    --port 8000 \
     --auth-password 'potatoes'
 ```
 
@@ -53,16 +53,16 @@ You can also use environment variables, like this:
 
 ```shell
 docker run -it -v ./config.json:/app/devices.json \
+    -p 8000:80 \
     -e TAPO_EMAIL=... \
     -e TAPO_PASSWORD=... \
-    -e PORT=8000 \
     -e AUTH_PASSWORD=... \
     clementnerma/tapo-rest
 ```
 
 The prebuilt binary works the same (same flags, same environment variables).
 
-This will run the server on `0.0.0.0:8000` (you can chose any port you like) and will require clients to use the `potatoes` password to log in.
+This will run the server on port `8000` (you can chose any port you like) and will require clients to use the `potatoes` password to log in.
 
 **Please note though that the server is not using SSL certificates (only plain HTTP/1 and HTTP/2),** so you absolutely need to use a proxy (such as Caddy) if you don't want this secret password to appear in plain text on your network.
 
