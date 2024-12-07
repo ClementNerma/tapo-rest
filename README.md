@@ -42,8 +42,8 @@ The `device_type` field can be any of:
 You can then run the server with:
 
 ```shell
-docker run -it -v ./path-to-your-config.json:/app/devices.json clementnerma/tapo-rest \
-    -p 8000:80 \
+docker run -it -v ./path-to-your-config.json:/app/devices.json \
+    -p 8000:80 clementnerma/tapo-rest \
     --tapo-email '<your tapo account email address>' \
     --tapo-password '<your tapo account password>' \
     --auth-password 'potatoes'
