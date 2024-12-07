@@ -4,10 +4,6 @@
 
 use std::sync::Arc;
 
-// OpenSSL is vendored, this instruction is not required
-// but allows to get rind of the "unused external dependency" lint
-use openssl as _;
-
 use anyhow::{bail, Context, Result};
 use clap::Parser;
 use config::Config;

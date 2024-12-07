@@ -1,6 +1,6 @@
 [package]
 name = "tapo-rest"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 
 [dependencies]
@@ -20,7 +20,6 @@ serde_json = "1.0.133"
 tapo = "0.7.17"
 tokio = { version = "1.41.1", features = ["macros", "rt-multi-thread", "fs"] }
 tower-http = { version = "0.6.1", features = ["cors"] }
-openssl = { version = "0.10", features = ["vendored"] }
 dirs = "5.0.1"
 paste = "1.0.15"
 axum-extra = { version = "0.9.6", features = ["typed-header"] }
