@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use clap::Parser;
 
 #[derive(Parser)]
+#[clap(author, version, about, long_about = None)]
 pub struct Cmd {
     #[clap(help = "Path to the devices config file (.json)")]
     pub devices_config_path: PathBuf,
