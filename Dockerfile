@@ -1,15 +1,14 @@
-FROM rust:alpine AS builder
+# This file is not intended to be used directly ;
+# please refer to the build script instead
 
-RUN apk add musl-dev perl make
+FROM debian:bullseye-slim
 
-WORKDIR /app
-
-COPY Cargo.toml Cargo.lock .
-COPY src src
-RUN cargo build --release
-
-FROM alpine
+# These two are provided by docker buildx
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETVARIANT
 
 WORKDIR /app
-COPY --from=builder /app/target/release/tapo-rest .
+COPY target/building-for-docker/artifacts/${TARGETOS}/${TARGETARCH}/${TARGETVARIANT}/tapo-rest ./
+
 ENTRYPOINT ["./tapo-rest", "/app/devices.json", "--port=80"]
