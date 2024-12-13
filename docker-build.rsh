@@ -13,14 +13,14 @@ if whereis('docker') == null && whereis('podman') == null {
 }
 
 # Get name and version from the manifest
-let manifest = parseToml(readFile('Cargo.toml'))
-let { name, version } = $manifest['package']
+let manifest = readFile('Cargo.toml').parseToml()
+let { name, version } = $manifest.package
 
 # List build targets
-let targets = map([
-    ['aarch64-unknown-linux-musl', 'linux/arm64'],
-    ['x86_64-unknown-linux-musl' , 'linux/amd64']
-])
+let targets = map {
+    'aarch64-unknown-linux-musl': 'linux/arm64',
+    'x86_64-unknown-linux-musl': 'linux/amd64'
+}
 
 # Build for every image
 let buildDir = 'target/building-for-docker'
