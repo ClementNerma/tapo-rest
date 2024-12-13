@@ -1,7 +1,7 @@
 # This file is not intended to be used directly ;
 # please refer to the build script instead
 
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 # These two are provided by docker buildx
 ARG TARGETOS
