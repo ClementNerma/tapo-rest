@@ -1,7 +1,7 @@
 use std::{collections::HashMap, path::PathBuf};
 
 use anyhow::{bail, Context, Result};
-use rand::{distributions::Alphanumeric, Rng};
+use rand::{distr::Alphanumeric, Rng};
 use serde::{Deserialize, Serialize};
 use tokio::fs;
 
@@ -56,7 +56,7 @@ impl Sessions {
     }
 
     fn _gen_session_id() -> String {
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
 
         (1..32)
             .map(|_| rng.sample(Alphanumeric) as char)
