@@ -1,0 +1,37 @@
+# This file is not intended to be used directly ;
+# please refer to the build script instead
+
+# Build stage
+FROM rust:1.77-slim-bookworm as builder
+
+# These two are provided by docker buildx
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETVARIANT
+
+WORKDIR /usr/src/tapo-rest
+
+# Copy source files
+COPY . .
+
+# Build the application
+RUN cargo build --release
+
+# Runtime stage
+FROM debian:bookworm-slim
+
+# These two are provided by docker buildx
+ARG TARGETOS
+ARG TARGETARCH
+ARG TARGETVARIANT
+
+WORKDIR /app
+
+# Copy the binary from the builder stage
+COPY --from=builder /usr/src/tapo-rest/target/release/tapo-rest ./
+
+# Create a non-root user
+RUN useradd -m -u 1000 tapo
+USER tapo
+
+ENTRYPOINT ["./tapo-rest", "/app/devices.json", "--port=80"]
