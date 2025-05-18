@@ -12,13 +12,13 @@ pub struct StateInit {
     pub sessions_file: PathBuf,
 }
 
-pub struct State {
+pub struct StateData {
     pub auth_password: String,
     pub devices: HashMap<String, TapoDevice>,
     pub sessions: Sessions,
 }
 
-impl State {
+impl StateData {
     pub async fn init(
         StateInit {
             auth_password,

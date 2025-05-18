@@ -16,7 +16,7 @@ use crate::{
     server::{actions::make_router, state::StateInit},
 };
 
-use self::state::State as SharedStateInner;
+use self::state::StateData;
 
 mod actions;
 mod auth;
@@ -28,7 +28,7 @@ mod state;
 pub use actions::TapoDeviceType;
 pub use errors::{ApiError, ApiResult};
 
-pub type SharedState = Arc<RwLock<SharedStateInner>>;
+pub type SharedState = Arc<RwLock<StateData>>;
 
 pub async fn serve(
     config: ServerConfig,
@@ -76,7 +76,7 @@ pub async fn serve(
         .nest("/actions", make_router())
         .layer(cors)
         .with_state(Arc::new(RwLock::new(
-            SharedStateInner::init(StateInit {
+            StateData::init(StateInit {
                 // TODO: hash?
                 auth_password,
                 devices,
