@@ -5,6 +5,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
+use log::info;
 use tokio::net::TcpListener;
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
@@ -83,7 +84,7 @@ pub async fn serve(
 
     let addr = format!("0.0.0.0:{port}");
 
-    println!("Launching server on {addr}...");
+    info!("Launching server on {addr}...");
 
     let tcp_listener = TcpListener::bind(addr).await?;
 

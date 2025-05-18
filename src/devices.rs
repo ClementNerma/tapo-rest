@@ -1,4 +1,5 @@
 use anyhow::{anyhow, Result};
+use log::debug;
 use tapo::{
     ApiClient, ColorLightHandler, LightHandler, PlugEnergyMonitoringHandler, PlugHandler,
     RgbLightStripHandler, RgbicLightStripHandler,
@@ -56,7 +57,8 @@ impl TapoDevice {
         }
 
         let mut conn = self._establish_conn().await?;
-        println!(
+
+        debug!(
             "Established a connection with device '{}'!",
             self.conn_infos.name
         );

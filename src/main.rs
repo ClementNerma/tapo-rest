@@ -1,27 +1,50 @@
 #![forbid(unsafe_code)]
 #![forbid(unused_must_use)]
 #![warn(unused_crate_dependencies)]
+// Use logging instead
+#![deny(clippy::print_stdout)]
+#![deny(clippy::print_stderr)]
+
+use std::process::ExitCode;
 
 use anyhow::{bail, Context, Result};
 use clap::Parser;
 use config::Config;
 use devices::TapoDevice;
+use log::{error, info};
 use tokio::{fs, task::JoinSet};
 
 use crate::cmd::Cmd;
 
+use self::logger::Logger;
+
 mod cmd;
 mod config;
 mod devices;
+mod logger;
 mod server;
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> ExitCode {
+    match inner_main().await {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(err) => {
+            error!("{err:?}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+async fn inner_main() -> Result<()> {
     let Cmd {
         devices_config_path,
         tapo_credentials,
         server_config,
+        verbosity,
     } = Cmd::parse();
+
+    // Set up the logger
+    Logger::new(verbosity).init().unwrap();
 
     let data_dir = dirs::data_local_dir()
         .context("Failed to find a valid local data directory")?
@@ -49,7 +72,7 @@ async fn main() -> Result<()> {
 
     let mut tasks = JoinSet::new();
 
-    println!(
+    info!(
         "| Attempting to connect to the {} configured device(s)...",
         devices.len()
     );
@@ -71,11 +94,9 @@ async fn main() -> Result<()> {
     while let Some(result) = tasks.join_next().await {
         let (device, conn_result) = result?;
 
-        println!("> Result for device: {:?} ", device.name());
-
         match conn_result {
-            Ok(()) => println!("-> [OK ] Connection successful!"),
-            Err(err) => eprintln!("-> [ERR] Connection failed: {err}"),
+            Ok(()) => info!("Device '{}' connected successfully!", device.name()),
+            Err(err) => error!("Failed to connect to device '{}': {err}", device.name()),
         }
 
         devices.push(device);
@@ -83,11 +104,11 @@ async fn main() -> Result<()> {
         remaining -= 1;
 
         if remaining > 0 {
-            println!("| {remaining} remaining...");
+            info!("| {remaining} remaining...");
         }
     }
 
-    println!("| Successfully connected to all devices!");
+    info!("| Done, launching server...");
 
     server::serve(server_config, devices, data_dir.join("sessions.json")).await
 }

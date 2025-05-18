@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 use clap::Parser;
+use log::LevelFilter;
 
 #[derive(Parser)]
 #[clap(author, version, about, long_about = None)]
@@ -13,6 +14,15 @@ pub struct Cmd {
 
     #[clap(flatten)]
     pub server_config: ServerConfig,
+
+    #[clap(
+        short,
+        long,
+        global = true,
+        help = "Level of verbosity",
+        default_value = "info"
+    )]
+    pub verbosity: LevelFilter,
 }
 
 #[derive(Parser, Clone)]
