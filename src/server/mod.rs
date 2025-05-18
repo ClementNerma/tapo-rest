@@ -2,25 +2,22 @@ use std::{fs, path::PathBuf, sync::Arc};
 
 use anyhow::{bail, Context, Result};
 use axum::{
-    extract::{Query, State},
     routing::{get, post},
     Router,
 };
-use serde::Deserialize;
-use tokio::{net::TcpListener, sync::RwLock};
+use tokio::net::TcpListener;
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
 use crate::{
     cmd::{PasswordArgGroup, ServerConfig},
     devices::TapoDevice,
-    server::{actions::make_router, state::StateInit},
+    server::actions::make_router,
 };
 
-use self::state::StateData;
+use self::{sessions::refresh_session, state::StateData};
 
 mod actions;
 mod auth;
-mod discovery;
 mod errors;
 mod sessions;
 mod state;
@@ -28,7 +25,7 @@ mod state;
 pub use actions::TapoDeviceType;
 pub use errors::{ApiError, ApiResult};
 
-pub type SharedState = Arc<RwLock<StateData>>;
+pub type SharedState = Arc<StateData>;
 
 pub async fn serve(
     config: ServerConfig,
@@ -71,19 +68,18 @@ pub async fn serve(
 
     let app = Router::new()
         .route("/login", post(auth::login))
-        .route("/discover", get(discovery::discover_devices))
         .route("/refresh-session", get(refresh_session))
         .nest("/actions", make_router())
         .layer(cors)
-        .with_state(Arc::new(RwLock::new(
-            StateData::init(StateInit {
+        .with_state(Arc::new(
+            StateData::init(
                 // TODO: hash?
                 auth_password,
                 devices,
                 sessions_file,
-            })
+            )
             .await?,
-        )));
+        ));
 
     let addr = format!("0.0.0.0:{port}");
 
@@ -94,30 +90,4 @@ pub async fn serve(
     axum::serve(tcp_listener, app.into_make_service())
         .await
         .map_err(Into::into)
-}
-
-#[derive(Deserialize)]
-struct RefreshDeviceSessionParams {
-    device: String,
-}
-
-async fn refresh_session(
-    State(state): State<SharedState>,
-    Query(params): Query<RefreshDeviceSessionParams>,
-) -> ApiResult<()> {
-    let RefreshDeviceSessionParams { device } = params;
-
-    let mut state = state.write().await;
-
-    let device = state
-        .devices
-        .get_mut(&device)
-        .with_context(|| format!("Unkown device: {device}"))?;
-
-    device
-        .refresh_session()
-        .await
-        .context("Failed to refresh device's session")?;
-
-    Ok(())
 }

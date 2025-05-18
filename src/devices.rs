@@ -3,50 +3,149 @@ use tapo::{
     ApiClient, ColorLightHandler, LightHandler, PlugEnergyMonitoringHandler, PlugHandler,
     RgbLightStripHandler, RgbicLightStripHandler,
 };
+use tokio::sync::RwLock;
 
 use crate::{cmd::TapoCredentials, config::TapoConnectionInfos, server::TapoDeviceType};
 
 pub struct TapoDevice {
-    pub name: String,
-    pub inner: TapoDeviceInner,
-}
-
-pub enum TapoDeviceInner {
-    L510(LightHandler),
-    L520(LightHandler),
-    L530(ColorLightHandler),
-    L535(ColorLightHandler),
-    L610(LightHandler),
-    L630(ColorLightHandler),
-    L900(RgbLightStripHandler),
-    L920(RgbicLightStripHandler),
-    L930(RgbicLightStripHandler),
-    P100(PlugHandler),
-    P105(PlugHandler),
-    P110(PlugEnergyMonitoringHandler),
-    P110M(PlugEnergyMonitoringHandler),
-    P115(PlugEnergyMonitoringHandler),
+    conn_infos: TapoConnectionInfos,
+    credentials: TapoCredentials,
+    client: RwLock<Option<TapoDeviceInner>>,
 }
 
 impl TapoDevice {
-    pub async fn connect(
-        conn_infos: TapoConnectionInfos,
-        credentials: &TapoCredentials,
-    ) -> Result<Self> {
+    pub fn new(conn_infos: TapoConnectionInfos, credentials: TapoCredentials) -> Self {
+        Self {
+            conn_infos,
+            credentials,
+            client: RwLock::new(None),
+        }
+    }
+
+    pub fn name(&self) -> &str {
+        &self.conn_infos.name
+    }
+
+    // pub async fn is_connected(&self) -> bool {
+    //     self.client.read().await.is_some()
+    // }
+
+    pub async fn try_connect(&self) -> Result<()> {
+        self.with_client(async |_| {}).await
+    }
+
+    pub async fn with_client<T>(&self, func: impl AsyncFnOnce(&TapoDeviceInner) -> T) -> Result<T> {
+        {
+            if let Some(conn) = &*self.client.read().await {
+                return Ok(func(conn).await);
+            }
+        }
+
+        self.with_client_mut(async move |client| func(&*client).await)
+            .await
+    }
+
+    pub async fn with_client_mut<T>(
+        &self,
+        func: impl AsyncFnOnce(&mut TapoDeviceInner) -> T,
+    ) -> Result<T> {
+        let mut conn_lock = self.client.write().await;
+
+        if let Some(conn) = conn_lock.as_mut() {
+            return Ok(func(conn).await);
+        }
+
+        let mut conn = self._establish_conn().await?;
+        println!(
+            "Established a connection with device '{}'!",
+            self.conn_infos.name
+        );
+
+        let out = func(&mut conn).await;
+        *conn_lock = Some(conn);
+        Ok(out)
+    }
+
+    pub async fn refresh_session(&self) -> Result<()> {
+        self.with_client_mut(async |conn| -> Result<()> {
+            match conn {
+                TapoDeviceInner::L510(device) => {
+                    device.refresh_session().await?;
+                }
+
+                TapoDeviceInner::L520(device) => {
+                    device.refresh_session().await?;
+                }
+
+                TapoDeviceInner::L530(device) => {
+                    device.refresh_session().await?;
+                }
+
+                TapoDeviceInner::L535(device) => {
+                    device.refresh_session().await?;
+                }
+
+                TapoDeviceInner::L610(device) => {
+                    device.refresh_session().await?;
+                }
+
+                TapoDeviceInner::L630(device) => {
+                    device.refresh_session().await?;
+                }
+
+                TapoDeviceInner::L900(device) => {
+                    device.refresh_session().await?;
+                }
+
+                TapoDeviceInner::L920(device) => {
+                    device.refresh_session().await?;
+                }
+
+                TapoDeviceInner::L930(device) => {
+                    device.refresh_session().await?;
+                }
+
+                TapoDeviceInner::P100(device) => {
+                    device.refresh_session().await?;
+                }
+
+                TapoDeviceInner::P105(device) => {
+                    device.refresh_session().await?;
+                }
+
+                TapoDeviceInner::P110(device) => {
+                    device.refresh_session().await?;
+                }
+
+                TapoDeviceInner::P110M(device) => {
+                    device.refresh_session().await?;
+                }
+
+                TapoDeviceInner::P115(device) => {
+                    device.refresh_session().await?;
+                }
+            }
+
+            Ok(())
+        })
+        .await?
+    }
+
+    async fn _establish_conn(&self) -> Result<TapoDeviceInner> {
         let TapoConnectionInfos {
             name,
             device_type,
             ip_addr,
-        } = &conn_infos;
+        } = &self.conn_infos;
 
         let TapoCredentials {
             tapo_email,
             tapo_password,
-        } = credentials;
+        } = &self.credentials;
 
         let tapo_client = ApiClient::new(tapo_email, tapo_password);
 
-        let inner =
+        let conn =
             match device_type {
                 TapoDeviceType::L510 => {
                     let auth = tapo_client.l510(ip_addr.to_string()).await.map_err(|err| {
@@ -162,72 +261,23 @@ impl TapoDevice {
                 }
             };
 
-        Ok(Self {
-            name: name.to_string(),
-            // conn_infos,
-            inner,
-        })
+        Ok(conn)
     }
+}
 
-    pub async fn refresh_session(&mut self) -> Result<()> {
-        match &mut self.inner {
-            TapoDeviceInner::L510(device) => {
-                device.refresh_session().await?;
-            }
-
-            TapoDeviceInner::L520(device) => {
-                device.refresh_session().await?;
-            }
-
-            TapoDeviceInner::L530(device) => {
-                device.refresh_session().await?;
-            }
-
-            TapoDeviceInner::L535(device) => {
-                device.refresh_session().await?;
-            }
-
-            TapoDeviceInner::L610(device) => {
-                device.refresh_session().await?;
-            }
-
-            TapoDeviceInner::L630(device) => {
-                device.refresh_session().await?;
-            }
-
-            TapoDeviceInner::L900(device) => {
-                device.refresh_session().await?;
-            }
-
-            TapoDeviceInner::L920(device) => {
-                device.refresh_session().await?;
-            }
-
-            TapoDeviceInner::L930(device) => {
-                device.refresh_session().await?;
-            }
-
-            TapoDeviceInner::P100(device) => {
-                device.refresh_session().await?;
-            }
-
-            TapoDeviceInner::P105(device) => {
-                device.refresh_session().await?;
-            }
-
-            TapoDeviceInner::P110(device) => {
-                device.refresh_session().await?;
-            }
-
-            TapoDeviceInner::P110M(device) => {
-                device.refresh_session().await?;
-            }
-
-            TapoDeviceInner::P115(device) => {
-                device.refresh_session().await?;
-            }
-        }
-
-        Ok(())
-    }
+pub enum TapoDeviceInner {
+    L510(LightHandler),
+    L520(LightHandler),
+    L530(ColorLightHandler),
+    L535(ColorLightHandler),
+    L610(LightHandler),
+    L630(ColorLightHandler),
+    L900(RgbLightStripHandler),
+    L920(RgbicLightStripHandler),
+    L930(RgbicLightStripHandler),
+    P100(PlugHandler),
+    P105(PlugHandler),
+    P110(PlugEnergyMonitoringHandler),
+    P110M(PlugEnergyMonitoringHandler),
+    P115(PlugEnergyMonitoringHandler),
 }

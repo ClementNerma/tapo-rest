@@ -2,8 +2,6 @@
 #![forbid(unused_must_use)]
 #![warn(unused_crate_dependencies)]
 
-use std::sync::Arc;
-
 use anyhow::{bail, Context, Result};
 use clap::Parser;
 use config::Config;
@@ -58,17 +56,29 @@ async fn main() -> Result<()> {
 
     let mut remaining = devices.len();
 
-    let tapo_credentials = Arc::new(tapo_credentials);
-
     for conn_infos in devices {
-        let tapo_credentials = Arc::clone(&tapo_credentials);
-        tasks.spawn(async move { TapoDevice::connect(conn_infos, &tapo_credentials).await });
+        let tapo_credentials = tapo_credentials.clone();
+
+        tasks.spawn(async move {
+            let device = TapoDevice::new(conn_infos, tapo_credentials);
+            let conn_result = device.try_connect().await;
+            (device, conn_result)
+        });
     }
 
     let mut devices = vec![];
 
     while let Some(result) = tasks.join_next().await {
-        devices.push(result??);
+        let (device, conn_result) = result?;
+
+        println!("> Result for device: {:?} ", device.name());
+
+        match conn_result {
+            Ok(()) => println!("-> [OK ] Connection successful!"),
+            Err(err) => eprintln!("-> [ERR] Connection failed: {err}"),
+        }
+
+        devices.push(device);
 
         remaining -= 1;
 

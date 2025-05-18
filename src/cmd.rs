@@ -15,7 +15,7 @@ pub struct Cmd {
     pub server_config: ServerConfig,
 }
 
-#[derive(Parser)]
+#[derive(Parser, Clone)]
 pub struct TapoCredentials {
     #[clap(long, env, help = "Your tapo account's email address")]
     pub tapo_email: String,

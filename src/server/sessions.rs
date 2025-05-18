@@ -1,13 +1,17 @@
 use std::{collections::HashMap, path::PathBuf};
 
 use anyhow::{bail, Context, Result};
+use axum::extract::{Query, State};
 use rand::{distr::Alphanumeric, Rng};
 use serde::{Deserialize, Serialize};
-use tokio::fs;
+use tokio::{fs, sync::RwLock};
+
+use super::{ApiResult, SharedState};
 
 pub struct Sessions {
     path: PathBuf,
-    map: HashMap<String, Session>,
+    // TODO: use a concurrent map type instead of a big RwLock
+    map: RwLock<HashMap<String, Session>>,
 }
 
 impl Sessions {
@@ -22,31 +26,36 @@ impl Sessions {
             HashMap::new()
         };
 
-        Ok(Self { path, map })
+        Ok(Self {
+            path,
+            map: RwLock::new(map),
+        })
     }
 
-    pub fn get(&self, id: &str) -> Option<&Session> {
-        self.map.get(id)
+    pub async fn get(&self, id: &str) -> Option<Session> {
+        self.map.read().await.get(id).cloned()
     }
 
-    pub async fn insert(&mut self) -> Result<String> {
+    pub async fn insert(&self) -> Result<String> {
         let session = Session {};
 
         let id = Self::_gen_session_id();
 
-        if self.map.contains_key(&id) {
+        let mut map_lock = self.map.write().await;
+
+        if map_lock.contains_key(&id) {
             bail!("A session already exists with the provided ID!");
         }
 
-        self.map.insert(id.clone(), session);
+        map_lock.insert(id.clone(), session);
 
-        self._flush().await?;
+        self._flush(&map_lock).await?;
 
         Ok(id)
     }
 
-    async fn _flush(&self) -> Result<()> {
-        let str = serde_json::to_string(&self.map).unwrap();
+    async fn _flush(&self, map: &HashMap<String, Session>) -> Result<()> {
+        let str = serde_json::to_string(&map).unwrap();
 
         fs::write(&self.path, &str)
             .await
@@ -67,4 +76,28 @@ impl Sessions {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Session {
     // TODO: permissions? only access to specific bulbs, etc.?
+}
+
+#[derive(Deserialize)]
+pub struct RefreshDeviceSessionParams {
+    device: String,
+}
+
+pub async fn refresh_session(
+    State(state): State<SharedState>,
+    Query(params): Query<RefreshDeviceSessionParams>,
+) -> ApiResult<()> {
+    let RefreshDeviceSessionParams { device } = params;
+
+    let device = state
+        .devices
+        .get(&device)
+        .with_context(|| format!("Unkown device: {device}"))?;
+
+    device
+        .refresh_session()
+        .await
+        .context("Failed to refresh device's session")?;
+
+    Ok(())
 }

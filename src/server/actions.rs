@@ -6,7 +6,6 @@ macro_rules! routes {
         use axum::routing::{get, Router};
         use serde::{Serialize, Deserialize};
         use super::SharedState;
-        use crate::devices::TapoDeviceInner;
 
         mod prelude {
             $( $prelude )*
@@ -20,14 +19,6 @@ macro_rules! routes {
             )+
         }
 
-        impl TapoDeviceType {
-            pub fn get_type(from: &TapoDeviceInner) -> Self {
-                match from {
-                    $( TapoDeviceInner::$device_name(_) $( | TapoDeviceInner::$alias_device_name(_) )* => Self::$device_name, )+
-                }
-            }
-        }
-
         pub fn make_router() -> Router<SharedState> {
             let mut router = Router::new();
 
@@ -38,7 +29,7 @@ macro_rules! routes {
                 ] {
                     $(
                         let uri = format!("/{device_name}/{}", stringify!($action_name).replace("_", "-"));
-                        println!("> Setting up action URI: {uri}");
+                        // println!("> Setting up action URI: {uri}");
 
                         router = router.route(&uri, get(self::$device_name::$action_name));
                     )+
@@ -99,8 +90,6 @@ macro_rules! routes {
                 ) -> ApiResult<$ret_type> {
                     paste! { let [<$action_name:camel Params>] { device $(, $param_name)* } = query; };
 
-                    let state = state.read().await;
-
                     auth(auth_header, &state.sessions).await?;
 
                     // TODO: session expiration, etc.?
@@ -110,26 +99,31 @@ macro_rules! routes {
                         "Provided device name was not found",
                     ))?;
 
-                    let client = validate_client_type!(&device.inner).ok_or_else(|| {
-                        ApiError::new(
-                            StatusCode::BAD_REQUEST,
-                            format!(
-                                "This route is reserved to '{}' devices",
-                                DEVICE_NAME
-                                    .iter()
-                                    .map(|name| format!("'{name}'"))
-                                    .collect::<Vec<_>>()
-                                    .join(", ")
-                            )
-                        )
-                    })?;
-
                     #[allow(unused_variables)]
                     let $state_var = &state;
 
-                    let $client_var = client;
+                    device
+                        .with_client(async move |client| {
+                            let client = validate_client_type!(client).ok_or_else(|| {
+                                ApiError::new(
+                                    StatusCode::BAD_REQUEST,
+                                    format!(
+                                        "This route is reserved to '{}' devices",
+                                        DEVICE_NAME
+                                            .iter()
+                                            .map(|name| format!("'{name}'"))
+                                            .collect::<Vec<_>>()
+                                            .join(", ")
+                                    )
+                                )
+                            })?;
 
-                    $fn_inner
+                            let $client_var = client;
+
+                            $fn_inner
+                        })
+                        .await
+                        .map_err(ApiError::from)?
                 }
             )+
         }) +

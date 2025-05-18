@@ -22,8 +22,6 @@ pub async fn login(
     State(state): State<SharedState>,
     Json(LoginData { password }): Json<LoginData>,
 ) -> ApiResult<String> {
-    let mut state = state.write().await;
-
     if password != state.auth_password {
         return Err(ApiError::new(
             StatusCode::FORBIDDEN,
@@ -39,10 +37,11 @@ pub async fn login(
 pub async fn auth(
     TypedHeader(auth_header): TypedHeader<Authorization<Bearer>>,
     sessions: &Sessions,
-) -> ApiResult<&Session> {
+) -> ApiResult<Session> {
     let session_id = auth_header.0.token();
 
     sessions
         .get(session_id)
+        .await
         .ok_or(ApiError::new(StatusCode::FORBIDDEN, "Invalid bearer token"))
 }
