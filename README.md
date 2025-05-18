@@ -66,7 +66,7 @@ This will run the server on port `8000` (you can chose any port you like) and wi
 
 **Please note though that the server is not using SSL certificates (only plain HTTP/1 and HTTP/2),** so you absolutely need to use a proxy (such as Caddy) if you don't want this secret password to appear in plain text on your network.
 
-Before exposing the REST API, the server starts by connecting to all the devices specicified in your config file, to ensure they are reachable and caching the authentication results.
+Before exposing the REST API, the server starts by connecting to all the devices specicified in your config file, to ensure they are reachable and caching the authentication results. Unreachable devices won't prevent the server from starting ; rather, when trying to communicate with them, a new connection will try to be established in real time.
 
 ## Client usage
 
