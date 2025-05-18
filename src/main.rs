@@ -73,11 +73,9 @@ async fn inner_main() -> Result<()> {
     let mut tasks = JoinSet::new();
 
     info!(
-        "| Attempting to connect to the {} configured device(s)...",
+        "Attempting to connect to the {} configured device(s)...",
         devices.len()
     );
-
-    let mut remaining = devices.len();
 
     for conn_infos in devices {
         let tapo_credentials = tapo_credentials.clone();
@@ -95,20 +93,14 @@ async fn inner_main() -> Result<()> {
         let (device, conn_result) = result?;
 
         match conn_result {
-            Ok(()) => info!("Device '{}' connected successfully!", device.name()),
-            Err(err) => error!("Failed to connect to device '{}': {err}", device.name()),
+            Ok(()) => info!("| Device '{}' connected successfully!", device.name()),
+            Err(err) => error!("! Failed to connect to device '{}': {err}", device.name()),
         }
 
         devices.push(device);
-
-        remaining -= 1;
-
-        if remaining > 0 {
-            info!("| {remaining} remaining...");
-        }
     }
 
-    info!("| Done, launching server...");
+    info!("Now launching server...");
 
     server::serve(server_config, devices, data_dir.join("sessions.json")).await
 }
