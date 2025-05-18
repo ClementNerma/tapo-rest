@@ -73,7 +73,7 @@ async fn main() -> Result<()> {
         remaining -= 1;
 
         if remaining > 0 {
-            println!("| {} remaining...", remaining);
+            println!("| {remaining} remaining...");
         }
     }
 
