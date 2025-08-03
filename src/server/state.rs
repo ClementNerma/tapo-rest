@@ -22,7 +22,7 @@ impl StateData {
             auth_password,
             devices: devices
                 .into_iter()
-                .map(|device| (device.name().to_owned(), device))
+                .map(|device| (device.conn_infos().name.to_owned(), device))
                 .collect(),
             sessions: Sessions::create(sessions_file).await?,
         })

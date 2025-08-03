@@ -23,8 +23,8 @@ impl TapoDevice {
         }
     }
 
-    pub fn name(&self) -> &str {
-        &self.conn_infos.name
+    pub fn conn_infos(&self) -> &TapoConnectionInfos {
+        &self.conn_infos
     }
 
     // pub async fn is_connected(&self) -> bool {

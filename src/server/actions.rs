@@ -11,7 +11,7 @@ macro_rules! build_router {
             $( $prelude )*
         }
 
-        #[derive(Serialize, Deserialize)]
+        #[derive(Serialize, Deserialize, Clone, Copy)]
         pub enum TapoDeviceType {
             $(
                 $device_name,

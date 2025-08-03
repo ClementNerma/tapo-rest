@@ -2,8 +2,9 @@ use std::{fs, path::PathBuf, sync::Arc};
 
 use anyhow::{bail, Context, Result};
 use axum::{
+    extract::State,
     routing::{get, post},
-    Router,
+    Json, Router,
 };
 use colored::Colorize;
 use log::info;
@@ -12,6 +13,7 @@ use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
 use crate::{
     cmd::{PasswordArgGroup, ServerConfig},
+    config::TapoConnectionInfos,
     devices::TapoDevice,
     server::actions::make_router,
 };
@@ -71,6 +73,7 @@ pub async fn serve(
     let app = Router::new()
         .route("/login", post(auth::login))
         .route("/refresh-session", get(refresh_session))
+        .route("/devices", get(list_devices))
         .nest("/actions", make_router())
         .layer(cors)
         .with_state(Arc::new(
@@ -97,4 +100,14 @@ pub async fn serve(
     axum::serve(tcp_listener, app.into_make_service())
         .await
         .map_err(Into::into)
+}
+
+async fn list_devices(state: State<Arc<StateData>>) -> Json<Vec<TapoConnectionInfos>> {
+    Json(
+        state
+            .devices
+            .values()
+            .map(|dev| dev.conn_infos().clone())
+            .collect(),
+    )
 }

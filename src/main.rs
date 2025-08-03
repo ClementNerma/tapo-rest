@@ -91,10 +91,11 @@ async fn inner_main() -> Result<()> {
 
     while let Some(result) = tasks.join_next().await {
         let (device, conn_result) = result?;
+        let name = &device.conn_infos().name;
 
         match conn_result {
-            Ok(()) => info!("| Device '{}' connected successfully!", device.name()),
-            Err(err) => error!("! Failed to connect to device '{}': {err}", device.name()),
+            Ok(()) => info!("| Device '{name}' connected successfully!",),
+            Err(err) => error!("! Failed to connect to device '{name}': {err}",),
         }
 
         devices.push(device);

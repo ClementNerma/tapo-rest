@@ -84,6 +84,8 @@ You can then access all other API routes which are located under `/actions` to u
 curl -i -X GET -H 'Authorization: Bearer <your session ID>' 'http://localhost:8000/actions/l530/on?device=living-room-bulb'
 ```
 
+You can also see the list of all available actions by checking `/actions`, and the list of all configured devices on `/devices`.
+
 ## Query parameters
 
 Some routes (such as `get-hourly-usage`) require timestamps. These must be provided in RFC 3339 format (e.g. `2023-12-31`).

@@ -9,7 +9,7 @@ pub struct Config {
     pub devices: Vec<TapoConnectionInfos>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct TapoConnectionInfos {
     pub name: String,
     pub device_type: TapoDeviceType,
