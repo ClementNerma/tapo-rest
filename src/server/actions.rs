@@ -1,4 +1,4 @@
-macro_rules! routes {
+macro_rules! build_router {
     (use mod { $($prelude:item)* }
      $($device_name:ident $(,$alias_device_name:ident)* {
         $(async fn $action_name:ident(&$state_var:ident, &$client_var:ident $(,$(#[$param_meta:meta])? $param_name:ident : $param_type:ty)*) -> $ret_type:ty $fn_inner:block)+
@@ -21,6 +21,7 @@ macro_rules! routes {
 
         pub fn make_router() -> Router<SharedState> {
             let mut router = Router::new();
+            let mut route_uris = vec![];
 
             $(
                 for device_name in [
@@ -29,12 +30,16 @@ macro_rules! routes {
                 ] {
                     $(
                         let uri = format!("/{device_name}/{}", stringify!($action_name).replace("_", "-"));
-                        // println!("> Setting up action URI: {uri}");
-
                         router = router.route(&uri, get(self::$device_name::$action_name));
+
+                        route_uris.push(uri);
                     )+
                 }
             )+
+
+            router = router.route("/", get(|| async move {
+                route_uris.join("\n")
+            }));
 
             router
         }
@@ -130,7 +135,7 @@ macro_rules! routes {
     };
 }
 
-routes! {
+build_router! {
     use mod {
         pub use axum::Json;
         pub use tapo::{

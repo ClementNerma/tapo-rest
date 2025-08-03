@@ -5,6 +5,7 @@ use axum::{
     routing::{get, post},
     Router,
 };
+use colored::Colorize;
 use log::info;
 use tokio::net::TcpListener;
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
@@ -84,7 +85,12 @@ pub async fn serve(
 
     let addr = format!("0.0.0.0:{port}");
 
-    info!("Launching server on {addr}...");
+    info!("Launching server on {}...", addr.bright_green());
+
+    info!(
+        "To see the list of all available actions, check {}",
+        format!("{addr}/actions").bright_green()
+    );
 
     let tcp_listener = TcpListener::bind(addr).await?;
 
