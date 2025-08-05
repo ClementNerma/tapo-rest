@@ -47,7 +47,8 @@ async fn inner_main() -> Result<()> {
     // Set up the logger
     Logger::new(verbosity).init().unwrap();
 
-    let data_dir = dirs::data_local_dir()
+    let data_dir = dirs::state_dir()
+        .or_else(dirs::data_local_dir)
         .context("Failed to find a valid local data directory")?
         .join(env!("CARGO_PKG_NAME"));
 
