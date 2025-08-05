@@ -113,12 +113,9 @@ macro_rules! build_router {
                                 ApiError::new(
                                     StatusCode::BAD_REQUEST,
                                     format!(
-                                        "This route is reserved to '{}' devices",
-                                        DEVICE_NAME
-                                            .iter()
-                                            .map(|name| format!("'{name}'"))
-                                            .collect::<Vec<_>>()
-                                            .join(", ")
+                                        "This route is reserved to {} devices, but the provided name refers to a {} device",
+                                        DEVICE_NAME.join(", "),
+                                        client.type_name()
                                     )
                                 )
                             })?;

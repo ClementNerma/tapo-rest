@@ -9,6 +9,7 @@ use std::process::ExitCode;
 
 use anyhow::{bail, Context, Result};
 use clap::Parser;
+use colored::Colorize;
 use config::Config;
 use devices::TapoDevice;
 use log::{error, info};
@@ -94,7 +95,8 @@ async fn inner_main() -> Result<()> {
         let name = &device.conn_infos().name;
 
         match conn_result {
-            Ok(()) => info!("| Device '{name}' connected successfully!",),
+            Ok(()) => info!("|> Device {} connected successfully!", name.bright_yellow()),
+
             Err(err) => error!("! Failed to connect to device '{name}': {err}",),
         }
 

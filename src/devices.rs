@@ -283,3 +283,24 @@ pub enum TapoDeviceInner {
     P110M(PlugEnergyMonitoringHandler),
     P115(PlugEnergyMonitoringHandler),
 }
+
+impl TapoDeviceInner {
+    pub fn type_name(&self) -> &'static str {
+        match self {
+            TapoDeviceInner::L510(_) => "L510",
+            TapoDeviceInner::L520(_) => "L520",
+            TapoDeviceInner::L530(_) => "L530",
+            TapoDeviceInner::L535(_) => "L535",
+            TapoDeviceInner::L610(_) => "L610",
+            TapoDeviceInner::L630(_) => "L630",
+            TapoDeviceInner::L900(_) => "L900",
+            TapoDeviceInner::L920(_) => "L920",
+            TapoDeviceInner::L930(_) => "L930",
+            TapoDeviceInner::P100(_) => "P100",
+            TapoDeviceInner::P105(_) => "P105",
+            TapoDeviceInner::P110(_) => "P110",
+            TapoDeviceInner::P110M(_) => "P110M",
+            TapoDeviceInner::P115(_) => "P115",
+        }
+    }
+}
