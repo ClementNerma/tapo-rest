@@ -2,17 +2,17 @@ use std::{path::PathBuf, sync::Arc};
 
 use anyhow::Result;
 use axum::{
+    Json, Router,
     extract::State,
     middleware,
     routing::{get, post},
-    Json, Router,
 };
 use colored::Colorize;
 use log::info;
 use tokio::net::TcpListener;
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
-use crate::{config::TapoConnectionInfos, server::actions::make_router};
+use crate::{config::TapoConnectionInfos, server::actions::make_actions_router};
 
 use self::{auth::auth_middleware, sessions::refresh_session, state::StateData};
 
@@ -37,18 +37,24 @@ pub async fn serve(port: u16, config_path: PathBuf, sessions_file: PathBuf) -> R
             AllowOrigin::any(),
         );
 
+    let (actions_router, actions_route_uris) = make_actions_router();
+
     let state = Arc::new(StateData::init(config_path, sessions_file).await?);
 
     let app = Router::new()
         .route("/reload-config", post(reload_config))
         .route("/refresh-session", get(refresh_session))
         .route("/devices", get(list_devices))
-        .nest("/actions", make_router())
+        .nest("/actions", actions_router)
         .route_layer(middleware::from_fn_with_state(
             Arc::clone(&state),
             auth_middleware,
         ))
         .route("/login", post(auth::login))
+        .route(
+            "/actions",
+            get(|| async move { actions_route_uris.join("\n") }),
+        )
         .layer(cors)
         .with_state(state);
 

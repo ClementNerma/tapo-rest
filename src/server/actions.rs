@@ -19,7 +19,7 @@ macro_rules! build_router {
             )+
         }
 
-        pub fn make_router() -> Router<SharedState> {
+        pub fn make_actions_router() -> (Router<SharedState>, Vec<String>) {
             let mut router = Router::new();
             let mut route_uris = vec![];
 
@@ -37,11 +37,7 @@ macro_rules! build_router {
                 }
             )+
 
-            router = router.route("/", get(|| async move {
-                route_uris.join("\n")
-            }));
-
-            router
+            (router, route_uris)
         }
 
         $( #[allow(non_snake_case)]
