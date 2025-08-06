@@ -1,6 +1,6 @@
 macro_rules! build_router {
     (use mod { $($prelude:item)* }
-     $($device_name:ident $(,$alias_device_name:ident)* {
+     $($device_name:ident $(,$alias_device_name:ident)* ($description: expr) {
         $(async fn $action_name:ident(&$state_var:ident, &$client_var:ident $(,$(#[$param_meta:meta])? $param_name:ident : $param_type:ty)*) -> $ret_type:ty $fn_inner:block)+
     })+) => {
         use axum::routing::{get, Router};
@@ -17,6 +17,20 @@ macro_rules! build_router {
                 $device_name,
                 $( $alias_device_name, )*
             )+
+        }
+
+        impl TapoDeviceType {
+            pub fn type_name(&self) -> &'static str {
+                match self {
+                    $( Self::$device_name $(| Self::$alias_device_name)* => stringify!($device_name) ),+
+                }
+            }
+
+            pub fn type_description(&self) -> &'static str {
+                match self {
+                    $( Self::$device_name $(| Self::$alias_device_name)* => $description ),+
+                }
+            }
         }
 
         pub fn make_actions_router() -> (Router<SharedState>, Vec<String>) {
@@ -147,7 +161,7 @@ build_router! {
         pub use chrono::NaiveDate;
     }
 
-    L510, L520, L610 {
+    L510, L520, L610 ("bulb") {
         async fn on(&state, &client) -> () {
             client.on().await.map_err(Into::into)
         }
@@ -169,7 +183,7 @@ build_router! {
         }
     }
 
-    L530, L535, L630 {
+    L530, L535, L630 ("bulb") {
         async fn on(&state, &client) -> () {
             client.on().await.map_err(Into::into)
         }
@@ -203,7 +217,7 @@ build_router! {
         }
     }
 
-    L900 {
+    L900 ("light strip") {
         async fn on(&state, &client) -> () {
             client.on().await.map_err(Into::into)
         }
@@ -237,7 +251,7 @@ build_router! {
         }
     }
 
-    L920, L930 {
+    L920, L930 ("light strip") {
         async fn on(&state, &client) -> () {
             client.on().await.map_err(Into::into)
         }
@@ -275,7 +289,7 @@ build_router! {
         }
     }
 
-    P100, P105 {
+    P100, P105 ("plug") {
         async fn on(&state, &client) -> () {
             client.on().await.map_err(Into::into)
         }
@@ -293,7 +307,7 @@ build_router! {
         }
     }
 
-    P110, P110M, P115 {
+    P110, P110M, P115 ("plug") {
         async fn on(&state, &client) -> () {
             client.on().await.map_err(Into::into)
         }
@@ -333,7 +347,7 @@ build_router! {
         }
     }
 
-    P300, P304, P316 {
+    P300, P304, P316 ("power strip") {
         async fn get_device_info(&state, &client) -> Json<DeviceInfoPowerStripResult> {
             Ok(Json(client.get_device_info().await?))
         }
