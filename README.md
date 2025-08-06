@@ -14,6 +14,11 @@ Start by creating a JSON config file (anywhere) with the following structure:
 
 ```json
 {
+    "tapo_credentials": {
+        "email": "<your Tapo account's email address>",
+        "password": "<your Tapo account's password>"
+    },
+    "server_password": "<whatever you want, must be unguessable>",
     "devices": [
         {
             "name": "living-room-bulb",
@@ -29,8 +34,7 @@ Start by creating a JSON config file (anywhere) with the following structure:
 }
 ```
 
-The `name` field can be set to whatever name you want.
-The `device_type` field can be any of:
+For devices, the `name` field can be set to whatever name you want, while `device_type` can be any of:
 
 * `L510`, `L520`, `L610` (light bulbs)
 * `L530`, `L535`, `L630` (light bulbs with customizable colors)
@@ -42,27 +46,12 @@ The `device_type` field can be any of:
 You can then run the server with:
 
 ```shell
-docker run -it -v ./path-to-your-config.json:/app/devices.json \
-    -p 8000:80 clementnerma/tapo-rest \
-    --tapo-email '<your tapo account email address>' \
-    --tapo-password '<your tapo account password>' \
-    --auth-password 'potatoes'
+docker run -it -v ./path-to-your-config.json:/app/devices.json -p 8000:80 clementnerma/tapo-rest
 ```
-
-You can also use environment variables, like this:
-
-```shell
-docker run -it -v ./config.json:/app/devices.json \
-    -p 8000:80 \
-    -e TAPO_EMAIL=... \
-    -e TAPO_PASSWORD=... \
-    -e AUTH_PASSWORD=... \
-    clementnerma/tapo-rest
-```
-
-The prebuilt binary works the same (same flags, same environment variables).
 
 This will run the server on port `8000` (you can chose any port you like) and will require clients to use the `potatoes` password to log in.
+
+The prebuilt binary works the same, but requires the additional `--port` (`-p`) flag.
 
 **Please note though that the server is not using SSL certificates (only plain HTTP/1 and HTTP/2),** so you absolutely need to use a proxy (such as Caddy) if you don't want this secret password to appear in plain text on your network.
 
@@ -78,13 +67,13 @@ curl -i -X POST -H 'Content-Type: application/json' --data '{ "password": "potat
 
 All subsequent calls to the API must include an `Authorization` header containing the session ID (`Authorization: Bearer <session ID>`). Sessions are preserved after server restart.
 
-You can then access all other API routes which are located under `/actions` to use your device. Each route takes a `?device=<name>` query parameter to know which device you are trying to interact with. The `<name>` is the same as the one you provided in your config file.
+You can then access all your devices through the `/actions` routes. Each route takes a `?device=<name>` query parameter to know which device you are trying to interact with. The `<name>` is the same as the one you provided in your config file.
 
 ```shell
 curl -i -X GET -H 'Authorization: Bearer <your session ID>' 'http://localhost:8000/actions/l530/on?device=living-room-bulb'
 ```
 
-You can also see the list of all available actions by checking `/actions`, and the list of all configured devices on `/devices`.
+You can find the list of all available actions by checking `/actions`, and the list of all configured devices on `/devices`.
 
 ## Query parameters
 
@@ -95,6 +84,16 @@ Some routes (such as `get-hourly-usage`) require timestamps. These must be provi
 Once connected to a Tapo device, a session is maintained between the server and the device. But Tapo devices set an expiration time, which means the session will eventually expire.
 
 If this happens, you can hit the `/refresh-session?device=...` route to refresh the session.
+
+## Live-reloading configuration
+
+You can live-reload the configuration file without restarting the server, by using `POST` on `/reload-config` (bearer token is required):
+
+```shell
+curl -i -X POST -H 'Authorization: Bearer <your session ID>' 'http://localhost:8000/reload-config'
+```
+
+Existing devices will be connected to again.
 
 ## Cinammon applet
 
