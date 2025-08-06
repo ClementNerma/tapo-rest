@@ -136,10 +136,12 @@ build_router! {
                 DeviceInfoRgbicLightStripResult,
                 DeviceInfoPlugResult,
                 DeviceInfoPlugEnergyMonitoringResult,
+                DeviceInfoPowerStripResult,
                 DeviceUsageEnergyMonitoringResult,
                 DeviceUsageResult,
                 EnergyUsageResult,
-                EnergyDataResult
+                EnergyDataResult,
+                PowerStripPlugResult
             }
         };
         pub use chrono::NaiveDate;
@@ -328,6 +330,16 @@ build_router! {
 
         async fn get_current_power(&state, &client) -> Json<CurrentPowerResult> {
             Ok(Json(client.get_current_power().await?))
+        }
+    }
+
+    P300, P304, P316 {
+        async fn get_device_info(&state, &client) -> Json<DeviceInfoPowerStripResult> {
+            Ok(Json(client.get_device_info().await?))
+        }
+
+        async fn get_child_device_list(&state, &client) -> Json<Vec<PowerStripPlugResult>> {
+            Ok(Json(client.get_child_device_list().await?))
         }
     }
 }

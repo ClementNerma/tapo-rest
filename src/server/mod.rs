@@ -42,15 +42,22 @@ pub async fn serve(port: u16, config_path: PathBuf, sessions_file: PathBuf) -> R
     let state = Arc::new(StateData::init(config_path, sessions_file).await?);
 
     let app = Router::new()
+        // Reload the configuration file
         .route("/reload-config", post(reload_config))
+        // Refresh a device's session
         .route("/refresh-session", get(refresh_session))
+        // List all available devices
         .route("/devices", get(list_devices))
+        // Nested action routes
         .nest("/actions", actions_router)
+        // Add authentication layer for all routes above
         .route_layer(middleware::from_fn_with_state(
             Arc::clone(&state),
             auth_middleware,
         ))
+        // Login route
         .route("/login", post(auth::login))
+        // List all available actions
         .route(
             "/actions",
             get(|| async move { actions_route_uris.join("\n") }),
