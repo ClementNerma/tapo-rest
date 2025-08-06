@@ -1,8 +1,8 @@
 use std::{collections::HashMap, path::PathBuf};
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use axum::extract::{Query, State};
-use rand::{distr::Alphanumeric, Rng};
+use rand::{Rng, distr::Alphanumeric};
 use serde::{Deserialize, Serialize};
 use tokio::{fs, sync::RwLock};
 

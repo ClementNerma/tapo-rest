@@ -1,21 +1,21 @@
 use std::sync::Arc;
 
 use axum::{
+    Json,
     extract::{Request, State},
     http::StatusCode,
     middleware::Next,
     response::Response,
-    Json,
 };
 use axum_extra::{
-    headers::{authorization::Bearer, Authorization},
     TypedHeader,
+    headers::{Authorization, authorization::Bearer},
 };
 use serde::Deserialize;
 
 use crate::server::SharedState;
 
-use super::{sessions::Session, state::StateData, ApiError, ApiResult};
+use super::{ApiError, ApiResult, sessions::Session, state::StateData};
 
 #[derive(Deserialize)]
 pub struct LoginData {
