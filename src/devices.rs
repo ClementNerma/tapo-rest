@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use anyhow::{anyhow, Result};
 use log::debug;
 use tapo::{
@@ -6,16 +8,19 @@ use tapo::{
 };
 use tokio::sync::RwLock;
 
-use crate::{cmd::TapoCredentials, config::TapoConnectionInfos, server::TapoDeviceType};
+use crate::{
+    config::{TapoConnectionInfos, TapoCredentials},
+    server::TapoDeviceType,
+};
 
 pub struct TapoDevice {
     conn_infos: TapoConnectionInfos,
-    credentials: TapoCredentials,
+    credentials: Arc<TapoCredentials>,
     client: RwLock<Option<TapoDeviceInner>>,
 }
 
 impl TapoDevice {
-    pub fn new(conn_infos: TapoConnectionInfos, credentials: TapoCredentials) -> Self {
+    pub fn new(conn_infos: TapoConnectionInfos, credentials: Arc<TapoCredentials>) -> Self {
         Self {
             conn_infos,
             credentials,
@@ -140,12 +145,9 @@ impl TapoDevice {
             ip_addr,
         } = &self.conn_infos;
 
-        let TapoCredentials {
-            tapo_email,
-            tapo_password,
-        } = &self.credentials;
+        let TapoCredentials { email, password } = &*self.credentials;
 
-        let tapo_client = ApiClient::new(tapo_email, tapo_password);
+        let tapo_client = ApiClient::new(email, password);
 
         let conn =
             match device_type {

@@ -22,7 +22,7 @@ pub async fn login(
     State(state): State<SharedState>,
     Json(LoginData { password }): Json<LoginData>,
 ) -> ApiResult<String> {
-    if password != state.auth_password {
+    if password != state.config.server_password {
         return Err(ApiError::new(
             StatusCode::FORBIDDEN,
             "Invalid credentials provided",
