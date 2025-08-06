@@ -127,6 +127,10 @@ impl TapoDevice {
                     device.refresh_session().await?;
                 }
 
+                TapoDeviceInner::P304M(device) => {
+                    device.refresh_session().await?;
+                }
+
                 TapoDeviceInner::P316(device) => {
                     device.refresh_session().await?;
                 }
@@ -167,6 +171,7 @@ impl TapoDevice {
             TapoDeviceType::P115 => tapo_client.p115(ip_addr).await.map(TapoDeviceInner::P115),
             TapoDeviceType::P300 => tapo_client.p300(ip_addr).await.map(TapoDeviceInner::P300),
             TapoDeviceType::P304 => tapo_client.p304(ip_addr).await.map(TapoDeviceInner::P304),
+            TapoDeviceType::P304M => tapo_client.p304(ip_addr).await.map(TapoDeviceInner::P304M),
             TapoDeviceType::P316 => tapo_client.p316(ip_addr).await.map(TapoDeviceInner::P316),
         };
 
@@ -197,6 +202,7 @@ pub enum TapoDeviceInner {
     P115(PlugEnergyMonitoringHandler),
     P300(PowerStripHandler),
     P304(PowerStripHandler),
+    P304M(PowerStripHandler),
     P316(PowerStripHandler),
 }
 
@@ -219,6 +225,7 @@ impl TapoDeviceInner {
             TapoDeviceInner::P115(_) => "P115",
             TapoDeviceInner::P300(_) => "P300",
             TapoDeviceInner::P304(_) => "P304",
+            TapoDeviceInner::P304M(_) => "P304M",
             TapoDeviceInner::P316(_) => "P316",
         }
     }

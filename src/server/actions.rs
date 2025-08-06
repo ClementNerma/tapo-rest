@@ -347,7 +347,7 @@ build_router! {
         }
     }
 
-    P300, P304, P316 ("power strip") {
+    P300, P304, P304M, P316 ("power strip") {
         async fn get_device_info(&state, &client) -> Json<DeviceInfoPowerStripResult> {
             Ok(Json(client.get_device_info().await?))
         }
