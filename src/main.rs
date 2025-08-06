@@ -63,5 +63,5 @@ async fn inner_main() -> Result<()> {
 
     info!("Now launching server...");
 
-    server::serve(port, &config_path, data_dir.join("sessions.json")).await
+    server::serve(port, config_path, data_dir.join("sessions.json")).await
 }

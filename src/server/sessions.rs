@@ -89,7 +89,9 @@ pub async fn refresh_session(
 ) -> ApiResult<()> {
     let RefreshDeviceSessionParams { device } = params;
 
-    let device = state
+    let loaded_config = state.loaded_config.read().await;
+
+    let device = loaded_config
         .devices
         .get(&device)
         .with_context(|| format!("Unkown device: {device}"))?;

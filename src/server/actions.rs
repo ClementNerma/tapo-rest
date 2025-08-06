@@ -52,12 +52,8 @@ macro_rules! build_router {
                 extract::{Query, State},
                 http::StatusCode,
             };
-            use axum_extra::{
-                headers::{authorization::Bearer, Authorization},
-                TypedHeader
-            };
             use crate::{
-                server::{ApiResult, ApiError, SharedState, auth::auth},
+                server::{ApiResult, ApiError, SharedState},
                 devices::TapoDeviceInner
             };
 
@@ -89,17 +85,16 @@ macro_rules! build_router {
                 }
 
                 pub(super) async fn $action_name(
-                    auth_header: TypedHeader<Authorization<Bearer>>,
                     Query(query): Query<paste! { [<$action_name:camel Params>] }>,
                     State(state): State<SharedState>
                 ) -> ApiResult<$ret_type> {
                     paste! { let [<$action_name:camel Params>] { device $(, $param_name)* } = query; };
 
-                    auth(auth_header, &state.sessions).await?;
-
                     // TODO: session expiration, etc.?
 
-                    let device = state.devices.get(&device).ok_or(ApiError::new(
+                    let loaded_config = state.loaded_config.read().await;
+
+                    let device = loaded_config.devices.get(&device).ok_or(ApiError::new(
                         StatusCode::NOT_FOUND,
                         "Provided device name was not found",
                     ))?;
