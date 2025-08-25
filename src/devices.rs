@@ -75,66 +75,24 @@ impl TapoDevice {
 
     pub async fn refresh_session(&self) -> Result<()> {
         self.with_client_mut(async |conn| -> Result<()> {
-            match conn {
-                TapoDeviceInner::L510(device) => {
-                    device.refresh_session().await?;
-                }
-                TapoDeviceInner::L520(device) => {
-                    device.refresh_session().await?;
-                }
-                TapoDeviceInner::L530(device) => {
-                    device.refresh_session().await?;
-                }
-                TapoDeviceInner::L535(device) => {
-                    device.refresh_session().await?;
-                }
-                TapoDeviceInner::L610(device) => {
-                    device.refresh_session().await?;
-                }
-                TapoDeviceInner::L630(device) => {
-                    device.refresh_session().await?;
-                }
-                TapoDeviceInner::L900(device) => {
-                    device.refresh_session().await?;
-                }
-                TapoDeviceInner::L920(device) => {
-                    device.refresh_session().await?;
-                }
-                TapoDeviceInner::L930(device) => {
-                    device.refresh_session().await?;
-                }
-                TapoDeviceInner::P100(device) => {
-                    device.refresh_session().await?;
-                }
-                TapoDeviceInner::P105(device) => {
-                    device.refresh_session().await?;
-                }
-                TapoDeviceInner::P110(device) => {
-                    device.refresh_session().await?;
-                }
-                TapoDeviceInner::P110M(device) => {
-                    device.refresh_session().await?;
-                }
-                TapoDeviceInner::P115(device) => {
-                    device.refresh_session().await?;
-                }
-
-                TapoDeviceInner::P300(device) => {
-                    device.refresh_session().await?;
-                }
-
-                TapoDeviceInner::P304(device) => {
-                    device.refresh_session().await?;
-                }
-
-                TapoDeviceInner::P304M(device) => {
-                    device.refresh_session().await?;
-                }
-
-                TapoDeviceInner::P316(device) => {
-                    device.refresh_session().await?;
-                }
+            // Call '.refresh_session()' on the device client
+            macro_rules! refresh_session {
+                ($conn: expr => $($enum_variant: ident),+) => {{
+                    match $conn {
+                        $(TapoDeviceInner::$enum_variant(device) => {
+                            device.refresh_session().await?;
+                        })+
+                    }
+                }}
             }
+
+            refresh_session!(conn =>
+                    L510, L520, L530, L535,
+                    L610, L630,
+                    L900, L920, L930,
+                    P100, P105, P110, P110M, P115,
+                    P300, P304, P304M, P316
+            );
 
             Ok(())
         })
