@@ -42,6 +42,7 @@ For devices, the `name` field can be set to whatever name you want, while `devic
 * `L920`, `L930` (RGB light strips with individually colored segments)
 * `P100`, `P105` (smart plugs)
 * `P110`, `P110M`, `P115` (smart plugs with energy monitoring)
+* `P300`, `P304`, `P304M`, `P316` (power strips)
 
 You can then run the server with:
 
