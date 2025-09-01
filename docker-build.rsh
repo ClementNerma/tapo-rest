@@ -18,6 +18,7 @@ let { name, version } = $manifest.package
 
 # List build targets
 let targets = map {
+    'arm-unknown-linux-gnueabihf': 'linux/arm/v6',
     'armv7-unknown-linux-gnueabihf': 'linux/arm/v7',
     'aarch64-unknown-linux-musl': 'linux/arm64',
     'x86_64-unknown-linux-musl': 'linux/amd64'
