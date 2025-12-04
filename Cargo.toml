@@ -1,11 +1,11 @@
 [package]
 name = "tapo-rest"
-version = "0.4.2"
+version = "0.4.3"
 edition = "2024"
 
 [dependencies]
-anyhow = "1.0.99"
-axum = { version = "0.8.4", default-features = false, features = [
+anyhow = "1.0.100"
+axum = { version = "0.8.7", default-features = false, features = [
   "http1",
   "http2",
   "tokio",
@@ -13,19 +13,19 @@ axum = { version = "0.8.4", default-features = false, features = [
   "query",
   "macros", # For debugging with #[axum::debug_handler]
 ] }
-clap = { version = "4.5.46", features = ["derive", "env"] }
+clap = { version = "4.5.53", features = ["derive", "env"] }
 rand = "0.9.2"
-serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.143"
-tapo = "0.8.4"
-tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread", "fs"] }
-tower-http = { version = "0.6.6", features = ["cors"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.145"
+tapo = "0.8.8"
+tokio = { version = "1.48.0", features = ["macros", "rt-multi-thread", "fs"] }
+tower-http = { version = "0.6.7", features = ["cors"] }
 dirs = "6.0.0"
 paste = "1.0.15"
-axum-extra = { version = "0.10.1", features = ["typed-header"] }
-chrono = { version = "0.4.41", default-features = false, features = [
+axum-extra = { version = "0.12.2", features = ["typed-header"] }
+chrono = { version = "0.4.42", default-features = false, features = [
   "std",
   "serde",
 ] }
-log = { version = "0.4.27", features = ["std"] }
+log = { version = "0.4.29", features = ["std"] }
 colored = "3.0.0"

@@ -4,7 +4,8 @@ use anyhow::{Result, anyhow};
 use log::debug;
 use tapo::{
     ApiClient, ColorLightHandler, LightHandler, PlugEnergyMonitoringHandler, PlugHandler,
-    PowerStripHandler, RgbLightStripHandler, RgbicLightStripHandler,
+    PowerStripEnergyMonitoringHandler, PowerStripHandler, RgbLightStripHandler,
+    RgbicLightStripHandler,
 };
 use tokio::sync::RwLock;
 
@@ -159,9 +160,9 @@ pub enum TapoDeviceInner {
     P110M(PlugEnergyMonitoringHandler),
     P115(PlugEnergyMonitoringHandler),
     P300(PowerStripHandler),
-    P304(PowerStripHandler),
-    P304M(PowerStripHandler),
-    P316(PowerStripHandler),
+    P304(PowerStripEnergyMonitoringHandler),
+    P304M(PowerStripEnergyMonitoringHandler),
+    P316(PowerStripEnergyMonitoringHandler),
 }
 
 impl TapoDeviceInner {
