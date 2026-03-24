@@ -13,11 +13,11 @@ axum = { version = "0.8.8", default-features = false, features = [
   "query",
   "macros", # For debugging with #[axum::debug_handler]
 ] }
-clap = { version = "4.5.60", features = ["derive", "env"] }
+clap = { version = "4.6.0", features = ["derive", "env"] }
 rand = "0.10.0"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
-tapo = "0.8.11"
+tapo = "0.8.12"
 tokio = { version = "1.50.0", features = ["macros", "rt-multi-thread", "fs"] }
 tower-http = { version = "0.6.8", features = ["cors"] }
 dirs = "6.0.0"
