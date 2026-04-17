@@ -3,7 +3,7 @@
 
 FROM debian:bookworm-slim
 
-# These two are provided by docker buildx
+# These three are provided by docker buildx
 ARG TARGETOS
 ARG TARGETARCH
 ARG TARGETVARIANT
