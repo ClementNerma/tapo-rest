@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.102"
-axum = { version = "0.8.8", default-features = false, features = [
+axum = { version = "0.8.9", default-features = false, features = [
   "http1",
   "http2",
   "tokio",
@@ -13,16 +13,16 @@ axum = { version = "0.8.8", default-features = false, features = [
   "query",
   "macros", # For debugging with #[axum::debug_handler]
 ] }
-clap = { version = "4.6.0", features = ["derive", "env"] }
-rand = "0.10.0"
+clap = { version = "4.6.1", features = ["derive", "env"] }
+rand = "0.10.1"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 tapo = "0.8.12"
-tokio = { version = "1.50.0", features = ["macros", "rt-multi-thread", "fs"] }
+tokio = { version = "1.52.1", features = ["macros", "rt-multi-thread", "fs"] }
 tower-http = { version = "0.6.8", features = ["cors"] }
 dirs = "6.0.0"
 paste = "1.0.15"
-axum-extra = { version = "0.12.5", features = ["typed-header"] }
+axum-extra = { version = "0.12.6", features = ["typed-header"] }
 chrono = { version = "0.4.44", default-features = false, features = [
   "std",
   "serde",
