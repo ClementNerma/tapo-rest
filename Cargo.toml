@@ -1,6 +1,6 @@
 [package]
 name = "tapo-rest"
-version = "0.4.4"
+version = "0.4.5"
 edition = "2024"
 
 [dependencies]
@@ -16,10 +16,10 @@ axum = { version = "0.8.9", default-features = false, features = [
 clap = { version = "4.6.1", features = ["derive", "env"] }
 rand = "0.10.1"
 serde = { version = "1.0.228", features = ["derive"] }
-serde_json = "1.0.149"
-tapo = "0.8.12"
-tokio = { version = "1.52.1", features = ["macros", "rt-multi-thread", "fs"] }
-tower-http = { version = "0.6.8", features = ["cors"] }
+serde_json = "1.0.150"
+tapo = "0.9.0"
+tokio = { version = "1.52.3", features = ["macros", "rt-multi-thread", "fs"] }
+tower-http = { version = "0.6.11", features = ["cors"] }
 dirs = "6.0.0"
 paste = "1.0.15"
 axum-extra = { version = "0.12.6", features = ["typed-header"] }
