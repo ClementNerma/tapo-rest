@@ -8,8 +8,8 @@ if (which cross | is-empty) {
 }
 
 # Ensure a container engine is installed
-if (which docker | is-empty) and (which podman | is-empty) {
-    error make 'Please install either "docker" or "podman" to continue.'
+if (which docker | is-empty) {
+    error make 'Please install "docker" to continue.'
 }
 
 # Get name and version from the manifest
@@ -50,9 +50,5 @@ for entry in $targets {
 # Build and publish Docker images
 print "\nPublishing on Docker Hub...\n"
 
-let cmd = if (which docker | is-not-empty) { 'docker' } else { 'podman' }
-
-let version_tag = $"docker.io/clementnerma/($name):($version)"
-
-# Build the image for all platforms
-^$cmd buildx build --platform ($targets | each { $in.docker_platform } | str join ',') -t $version_tag --push .
+# Build and publish the image for all platforms
+docker buildx build --push . --platform ($targets | each { $in.docker_platform } | str join ',') --tag $"clementnerma/($name):($version)" --tag $"clementnerma/($name):latest"
