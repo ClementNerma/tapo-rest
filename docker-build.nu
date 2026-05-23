@@ -48,18 +48,11 @@ for entry in $targets {
 }
 
 # Build and publish Docker images
-print $"\nPublishing on Docker Hub...\n"
+print "\nPublishing on Docker Hub...\n"
 
-let cmd = if (which docker | is-not-empty) {
-    'docker'
-} else {
-    'podman'
-}
+let cmd = if (which docker | is-not-empty) { 'docker' } else { 'podman' }
 
 let version_tag = $"docker.io/clementnerma/($name):($version)"
 
 # Build the image for all platforms
-^$cmd buildx build . -t $version_tag --platform ($targets | each { $in.docker_platform } | str join ',')
-
-# Publish to Docker Hub
-^$cmd push $version_tag
+^$cmd buildx build --platform ($targets | each { $in.docker_platform } | str join ',') -t $version_tag --push .
