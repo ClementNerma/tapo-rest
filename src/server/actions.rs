@@ -22,7 +22,10 @@ macro_rules! build_router {
         impl TapoDeviceType {
             pub fn type_name(&self) -> &'static str {
                 match self {
-                    $( Self::$device_name $(| Self::$alias_device_name)* => stringify!($device_name) ),+
+                    $(
+                        Self::$device_name => stringify!($device_name),
+                        $( Self::$alias_device_name => stringify!($alias_device_name), )*
+                    )+
                 }
             }
 
