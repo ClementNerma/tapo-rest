@@ -59,7 +59,8 @@ match $dockerCmd {
   }
 
   'podman' => {
-    podman manifest push --all docker.io/clementnerma/($name):($version) docker://docker.io/clementnerma/($name):($version)
-    podman manifest push --all docker.io/clementnerma/($name):($version) docker://docker.io/clementnerma/($name):latest
+    podman build . --platform ($targets | each { $in.docker_platform } | str join ',') --manifest $"clementnerma/($name):($version)"
+    podman manifest push --all localhost/clementnerma/($name):($version) docker://docker.io/clementnerma/($name):($version)
+    podman manifest push --all localhost/clementnerma/($name):($version) docker://docker.io/clementnerma/($name):latest
   }
 }
