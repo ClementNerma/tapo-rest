@@ -2,14 +2,16 @@
 # I resort here to building locally using `cross` and then copying the
 # output into a container.
 
-# Ensure 'cross' is installed
 if (which cross | is-empty) {
-    error make 'Please install "cross" to continue.'
+  error make 'Please install "cross" to continue.'
 }
 
-# Ensure a container engine is installed
-if (which docker | is-empty) {
-    error make 'Please install "docker" to continue.'
+let dockerCmd = if not (which docker | is-empty) {
+  'docker'
+} else if not (which podman | is-empty) {
+  'podman'
+} else {
+  error make 'Please install either Podman or Docker to continue.'
 }
 
 # Get name and version from the manifest
@@ -51,4 +53,13 @@ for entry in $targets {
 print "\nPublishing on Docker Hub...\n"
 
 # Build and publish the image for all platforms
-docker buildx build --push . --platform ($targets | each { $in.docker_platform } | str join ',') --tag $"clementnerma/($name):($version)" --tag $"clementnerma/($name):latest"
+match $dockerCmd {
+  'docker' => {
+    docker buildx build --push . --platform ($targets | each { $in.docker_platform } | str join ',') --tag $"clementnerma/($name):($version)" --tag $"clementnerma/($name):latest"
+  }
+
+  'podman' => {
+    podman manifest push --all docker.io/clementnerma/($name):($version) docker://docker.io/clementnerma/($name):($version)
+    podman manifest push --all docker.io/clementnerma/($name):($version) docker://docker.io/clementnerma/($name):latest
+  }
+}
