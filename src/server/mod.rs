@@ -8,7 +8,7 @@ use axum::{
     routing::{get, post},
 };
 use colored::Colorize;
-use log::info;
+use log::{error, info};
 use tokio::net::TcpListener;
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
@@ -77,8 +77,16 @@ pub async fn serve(port: u16, config_path: PathBuf, sessions_file: PathBuf) -> R
     let tcp_listener = TcpListener::bind(addr).await?;
 
     axum::serve(tcp_listener, app.into_make_service())
+        .with_graceful_shutdown(shutdown_signal())
         .await
         .map_err(Into::into)
+}
+
+async fn shutdown_signal() {
+    if let Err(err) = tokio::signal::ctrl_c().await {
+        error!("Failed to listen for shutdown signal: {err}");
+    }
+    info!("Received shutdown signal, shutting down gracefully...");
 }
 
 async fn list_devices(state: State<Arc<StateData>>) -> Json<Vec<TapoConnectionInfos>> {
