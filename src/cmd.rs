@@ -6,7 +6,7 @@ use log::LevelFilter;
 #[derive(FromArgs)]
 #[argh(description = "Tapo REST server")]
 pub struct Cmd {
-    #[argh(option, description = "path to the configuration file (.json)")]
+    #[argh(positional, description = "path to the configuration file (.json)")]
     pub config_path: PathBuf,
 
     #[argh(option, short = 'p', long = "port", description = "port to serve on")]
