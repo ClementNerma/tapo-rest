@@ -40,11 +40,10 @@ impl Sessions {
     }
 
     pub async fn insert(&self) -> Result<String> {
-        let session = Session {};
-
-        let id = Self::_gen_session_id();
-
         let mut map_lock = self.map.write().await;
+
+        let session = Session {};
+        let id = Self::_gen_session_id();
 
         if map_lock.contains_key(&id) {
             bail!("A session already exists with the provided ID!");
