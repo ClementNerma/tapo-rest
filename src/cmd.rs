@@ -1,23 +1,23 @@
 use std::path::PathBuf;
 
-use clap::Parser;
+use argh::FromArgs;
 use log::LevelFilter;
 
-#[derive(Parser)]
-#[clap(author, version, about, long_about = None)]
+#[derive(FromArgs)]
+#[argh(description = "Tapo REST server")]
 pub struct Cmd {
-    #[clap(help = "Path to the configuration file (.json)")]
+    #[argh(option, description = "path to the configuration file (.json)")]
     pub config_path: PathBuf,
 
-    #[clap(short, long, env, help = "Port to serve on")]
+    #[argh(option, short = 'p', long = "port", description = "port to serve on")]
     pub port: u16,
 
-    #[clap(
-        short,
-        long,
-        global = true,
-        help = "Level of verbosity",
-        default_value = "info"
+    #[argh(
+        option,
+        short = 'v',
+        long = "verbosity",
+        description = "level of verbosity",
+        default = "LevelFilter::Info"
     )]
     pub verbosity: LevelFilter,
 }

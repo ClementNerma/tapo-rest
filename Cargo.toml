@@ -13,7 +13,6 @@ axum = { version = "0.8.9", default-features = false, features = [
   "query",
   "macros", # For debugging with #[axum::debug_handler]
 ] }
-clap = { version = "4.6.5", features = ["derive", "env"] }
 rand = "0.10.2"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
@@ -29,3 +28,4 @@ chrono = { version = "0.4.45", default-features = false, features = [
 ] }
 log = { version = "0.4.33", features = ["std"] }
 colored = "3.1.1"
+argh = "0.1.19"

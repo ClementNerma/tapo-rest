@@ -8,7 +8,6 @@
 use std::process::ExitCode;
 
 use anyhow::{Context, Result, bail};
-use clap::Parser;
 use log::{error, info};
 use tokio::fs;
 
@@ -38,7 +37,7 @@ async fn inner_main() -> Result<()> {
         config_path,
         port,
         verbosity,
-    } = Cmd::parse();
+    } = argh::from_env::<Cmd>();
 
     // Set up the logger
     Logger::new(verbosity).init().unwrap();
