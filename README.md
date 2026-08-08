@@ -42,6 +42,8 @@ Start by creating a JSON config file (anywhere) with the following structure:
 }
 ```
 
+API keys must be **at least** 32 characters long, and only made of alphanumeric characters. To generate a key, you can use `openssl rand -hex 32`. It should not contain any sensitive information.
+
 For devices, the `name` field can be set to whatever name you want, while `device_type` can be any of:
 
 * `L510`, `L520`, `L610` (light bulbs)

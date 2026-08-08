@@ -1,6 +1,6 @@
 use std::{collections::HashMap, path::PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use tokio::{fs, sync::RwLock};
 
 use crate::{config::Config, devices::TapoDevice};
@@ -41,6 +41,22 @@ async fn load_config(config_path: &PathBuf) -> Result<(Config, HashMap<String, T
 
     let config = serde_json::from_str::<Config>(&config_str)
         .context("Failed to parse the devices configuration file")?;
+
+    for api_key in &config.server.api_keys {
+        if api_key.key.chars().any(|c| !c.is_ascii_alphanumeric()) {
+            bail!(
+                "API key '{}' contains non-alphanumeric characters",
+                api_key.name
+            );
+        }
+
+        if api_key.key.len() < 32 {
+            bail!(
+                "API key '{}' is too short (minimum length: 32 characters)",
+                api_key.name
+            );
+        }
+    }
 
     let devices = load_tapo_devices(&config)
         .await
