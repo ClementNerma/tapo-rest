@@ -23,10 +23,9 @@ pub async fn auth_middleware(
 ) -> Result<Response, ApiError> {
     let api_key = auth_header.0.token();
 
-    let loaded_config = state.loaded_config.read().await;
+    let config = state.config.read().await;
 
-    if !loaded_config
-        .config
+    if !config
         .server
         .api_keys
         .iter()

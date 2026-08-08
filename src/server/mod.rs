@@ -96,10 +96,9 @@ async fn shutdown_signal() {
 async fn list_devices(state: State<Arc<StateData>>) -> Json<Vec<TapoConnectionInfos>> {
     Json(
         state
-            .loaded_config
+            .devices
             .read()
             .await
-            .devices
             .values()
             .map(|dev| dev.conn_infos().clone())
             .collect(),
@@ -126,10 +125,9 @@ pub async fn refresh_session(
 ) -> ApiResult<()> {
     let RefreshDeviceSessionParams { device } = params;
 
-    let loaded_config = state.loaded_config.read().await;
+    let devices = state.devices.read().await;
 
-    let device = loaded_config
-        .devices
+    let device = devices
         .get(&device)
         .ok_or_else(|| (StatusCode::NOT_FOUND, format!("Unknown device: {device}")))?;
 

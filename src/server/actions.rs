@@ -105,9 +105,9 @@ macro_rules! build_router {
 
                     // TODO: session expiration, etc.?
 
-                    let loaded_config = state.loaded_config.read().await;
+                    let devices = state.devices.read().await;
 
-                    let device = loaded_config.devices.get(&device).ok_or(ApiError::new(
+                    let device = devices.get(&device).ok_or(ApiError::new(
                         StatusCode::NOT_FOUND,
                         "Provided device name was not found",
                     ))?;

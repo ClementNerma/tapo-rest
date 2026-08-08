@@ -9,7 +9,8 @@ use super::loader::load_tapo_devices_from_config;
 
 pub struct StateData {
     pub config_path: PathBuf,
-    pub loaded_config: RwLock<LoadedConfig>,
+    pub config: RwLock<Config>,
+    pub devices: RwLock<HashMap<String, TapoDevice>>,
 }
 
 impl StateData {
@@ -18,32 +19,29 @@ impl StateData {
 
         Ok(Self {
             config_path,
-            loaded_config: RwLock::new(LoadedConfig::new(config, devices)),
+            config: RwLock::new(config),
+            devices: RwLock::new(
+                devices
+                    .into_iter()
+                    .map(|device| (device.conn_infos().name.clone(), device))
+                    .collect(),
+            ),
         })
     }
 
     pub async fn reload_config(&self) -> Result<()> {
         let (config, devices) = load_tapo_devices_from_config(&self.config_path).await?;
 
-        *self.loaded_config.write().await = LoadedConfig::new(config, devices);
+        // Prevent TOCTOU
+        let mut config_lock = self.config.write().await;
+        let mut devices_lock = self.devices.write().await;
+
+        *config_lock = config;
+        *devices_lock = devices
+            .into_iter()
+            .map(|device| (device.conn_infos().name.clone(), device))
+            .collect();
 
         Ok(())
-    }
-}
-
-pub struct LoadedConfig {
-    pub config: Config,
-    pub devices: HashMap<String, TapoDevice>,
-}
-
-impl LoadedConfig {
-    pub fn new(config: Config, devices: Vec<TapoDevice>) -> Self {
-        Self {
-            config,
-            devices: devices
-                .into_iter()
-                .map(|device| (device.conn_infos().name.clone(), device))
-                .collect(),
-        }
     }
 }
