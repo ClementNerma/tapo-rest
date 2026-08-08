@@ -36,3 +36,9 @@ impl From<anyhow::Error> for ApiError {
         Self::new(StatusCode::INTERNAL_SERVER_ERROR, format!("{value}"))
     }
 }
+
+impl From<(StatusCode, String)> for ApiError {
+    fn from(value: (StatusCode, String)) -> Self {
+        Self::new(value.0, value.1)
+    }
+}

@@ -1,7 +1,10 @@
 use std::{collections::HashMap, path::PathBuf};
 
 use anyhow::{Context, Result, bail};
-use axum::extract::{Query, State};
+use axum::{
+    extract::{Query, State},
+    http::StatusCode,
+};
 use rand::{RngExt, distr::Alphanumeric};
 use serde::{Deserialize, Serialize};
 use tokio::{fs, sync::RwLock};
@@ -91,10 +94,12 @@ pub async fn refresh_session(
 
     let loaded_config = state.loaded_config.read().await;
 
-    let device = loaded_config
-        .devices
-        .get(&device)
-        .with_context(|| format!("Unkown device: {device}"))?;
+    let device = loaded_config.devices.get(&device).ok_or_else(|| {
+        (
+            StatusCode::UNAUTHORIZED,
+            format!("Unknown device: {device}"),
+        )
+    })?;
 
     device
         .refresh_session()
