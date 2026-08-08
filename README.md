@@ -35,7 +35,7 @@ Start by creating a JSON config file (anywhere) with the following structure:
         "api_keys": [
             {
                 "name": "Home Assistant",
-                "key": "mysuperapikeyforhomeassistant"
+                "key": "<unguessable 32-or-more-char alphanumeric key>"
             }
         ]
     }
