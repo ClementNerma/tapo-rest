@@ -11,6 +11,7 @@ use axum_extra::{
     TypedHeader,
     headers::{Authorization, authorization::Bearer},
 };
+use log::{error, info};
 use serde::Deserialize;
 
 use crate::server::SharedState;
@@ -28,11 +29,15 @@ pub async fn login(
     Json(LoginData { password }): Json<LoginData>,
 ) -> ApiResult<String> {
     if password != state.loaded_config.read().await.config.server_password {
+        error!("ERROR: Invalid credentials provided");
+
         return Err(ApiError::new(
             StatusCode::FORBIDDEN,
             "Invalid credentials provided",
         ));
     }
+
+    info!("INFO: User logged in successfully");
 
     let session_id = state.sessions.insert().await?;
 
