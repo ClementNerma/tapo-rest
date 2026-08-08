@@ -18,7 +18,6 @@ Start by creating a JSON config file (anywhere) with the following structure:
         "email": "<your Tapo account's email address>",
         "password": "<your Tapo account's password>"
     },
-    "server_password": "<whatever you want, must be unguessable>",
     "devices": [
         {
             "name": "living-room-bulb",
@@ -30,7 +29,11 @@ Start by creating a JSON config file (anywhere) with the following structure:
             "device_type": "L530",
             "ip_addr": "<ip address of the device>"
         }
-    ]
+    ],
+    "server": {
+        "password": "<whatever you want, must be unguessable>",
+        "sessions_lifetime_in_seconds": 3600 // here, 1 hour ; can be any duration you want
+    }
 }
 ```
 
@@ -58,7 +61,7 @@ The prebuilt binary works the same, but requires the additional `--port` (`-p`) 
 
 Before exposing the REST API, the server starts by connecting to all the devices specicified in your config file, to ensure they are reachable and caching the authentication results. Unreachable devices won't prevent the server from starting ; rather, when trying to communicate with them, a new connection will try to be established in real time.
 
-## Client usage
+## Authentication
 
 Clients call the `POST /login` route with a body of `{ "password": "potatoes" }`. This returns a raw string, which is the session ID.
 
@@ -76,11 +79,13 @@ curl -i -X GET -H 'Authorization: Bearer <your session ID>' 'http://localhost:80
 
 You can find the list of all available actions by checking `/actions`, and the list of all configured devices on `/devices`.
 
+Tokens time out after a delay specified in the configuration file. After that, all usage of that same token will return an error indicating it expired.
+
 ## Query parameters
 
 Some routes (such as `get-hourly-usage`) require timestamps. These must be provided in RFC 3339 format (e.g. `2023-12-31`).
 
-## Session timeout
+## Tapo session timeout
 
 Once connected to a Tapo device, a session is maintained between the server and the device. But Tapo devices set an expiration time, which means the session will eventually expire.
 
