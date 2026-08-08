@@ -1,6 +1,6 @@
 use std::{path::PathBuf, sync::Arc};
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use axum::{
     Json, Router,
     extract::State,
@@ -102,9 +102,11 @@ async fn list_devices(state: State<Arc<StateData>>) -> Json<Vec<TapoConnectionIn
     )
 }
 
-async fn reload_config(state: State<Arc<StateData>>) -> String {
-    match state.reload_config().await {
-        Ok(()) => "OK".to_owned(),
-        Err(err) => format!("Error: {err}"),
-    }
+async fn reload_config(state: State<Arc<StateData>>) -> ApiResult<()> {
+    state
+        .reload_config()
+        .await
+        .context("Failed to reload config")?;
+
+    Ok(())
 }
