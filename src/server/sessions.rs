@@ -43,7 +43,7 @@ impl Sessions {
         let mut map_lock = self.map.write().await;
 
         let session = Session {};
-        let id = Self::_gen_session_id();
+        let id = Self::gen_session_id();
 
         if map_lock.contains_key(&id) {
             bail!("A session already exists with the provided ID!");
@@ -51,12 +51,12 @@ impl Sessions {
 
         map_lock.insert(id.clone(), session);
 
-        self._flush(&map_lock).await?;
+        self.flush(&map_lock).await?;
 
         Ok(id)
     }
 
-    async fn _flush(&self, map: &HashMap<String, Session>) -> Result<()> {
+    async fn flush(&self, map: &HashMap<String, Session>) -> Result<()> {
         let str = serde_json::to_string(&map).unwrap();
 
         fs::write(&self.path, &str)
@@ -66,7 +66,7 @@ impl Sessions {
         Ok(())
     }
 
-    fn _gen_session_id() -> String {
+    fn gen_session_id() -> String {
         let mut rng = rand::rng();
 
         (1..32)

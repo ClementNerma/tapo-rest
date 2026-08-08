@@ -62,7 +62,7 @@ impl TapoDevice {
             return Ok(func(conn).await);
         }
 
-        let mut conn = self._establish_conn().await?;
+        let mut conn = self.establish_conn().await?;
 
         debug!(
             "Established a connection with device '{}'!",
@@ -100,7 +100,7 @@ impl TapoDevice {
         .await?
     }
 
-    async fn _establish_conn(&self) -> Result<TapoDeviceInner> {
+    async fn establish_conn(&self) -> Result<TapoDeviceInner> {
         let TapoConnectionInfos {
             name,
             device_type,
