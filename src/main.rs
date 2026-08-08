@@ -33,7 +33,7 @@
     clippy::similar_names
 )]
 
-use std::process::ExitCode;
+use std::{process::ExitCode, time::Duration};
 
 use anyhow::{Context, Result, bail};
 use log::{error, info};
@@ -64,6 +64,7 @@ async fn inner_main() -> Result<()> {
     let Cmd {
         config_path,
         port,
+        session_lifespan,
         verbosity,
     } = argh::from_env::<Cmd>();
 
@@ -90,5 +91,11 @@ async fn inner_main() -> Result<()> {
 
     info!("Now launching server...");
 
-    server::serve(port, config_path, data_dir.join("sessions.json")).await
+    server::serve(server::ServeOptions {
+        config_path,
+        sessions_file: data_dir.join("sessions.json"),
+        port,
+        session_lifespan: session_lifespan.map(Duration::from_secs),
+    })
+    .await
 }

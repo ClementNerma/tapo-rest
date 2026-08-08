@@ -14,6 +14,14 @@ pub struct Cmd {
 
     #[argh(
         option,
+        short = 's',
+        long = "session-lifespan",
+        description = "how long a session should last in seconds (default: infinity)"
+    )]
+    pub session_lifespan: Option<u64>,
+
+    #[argh(
+        option,
         short = 'v',
         long = "verbosity",
         description = "level of verbosity",

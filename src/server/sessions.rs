@@ -1,4 +1,8 @@
-use std::{collections::HashMap, path::PathBuf};
+use std::{
+    collections::HashMap,
+    path::PathBuf,
+    time::{Duration, SystemTime},
+};
 
 use anyhow::{Context, Result, bail};
 use axum::{
@@ -13,12 +17,12 @@ use super::{ApiResult, SharedState};
 
 pub struct Sessions {
     path: PathBuf,
-    // TODO: use a concurrent map type instead of a big RwLock
     map: RwLock<HashMap<String, Session>>,
+    session_lifespan: Option<Duration>,
 }
 
 impl Sessions {
-    pub async fn create(path: PathBuf) -> Result<Self> {
+    pub async fn create(path: PathBuf, session_lifespan: Option<Duration>) -> Result<Self> {
         let map = if path.exists() {
             let sessions_str = fs::read_to_string(&path)
                 .await
@@ -32,6 +36,7 @@ impl Sessions {
         Ok(Self {
             path,
             map: RwLock::new(map),
+            session_lifespan,
         })
     }
 
@@ -42,7 +47,13 @@ impl Sessions {
     pub async fn insert(&self) -> Result<String> {
         let mut map_lock = self.map.write().await;
 
-        let session = Session {};
+        let session = Session {
+            created_at: SystemTime::now(),
+            expires_at: self
+                .session_lifespan
+                .map(|lifespan| SystemTime::now() + lifespan),
+        };
+
         let id = Self::gen_session_id();
 
         if map_lock.contains_key(&id) {
@@ -77,7 +88,8 @@ impl Sessions {
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Session {
-    // TODO: permissions? only access to specific bulbs, etc.?
+    pub created_at: SystemTime,
+    pub expires_at: Option<SystemTime>,
 }
 
 #[derive(Deserialize)]

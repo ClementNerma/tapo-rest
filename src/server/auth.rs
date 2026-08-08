@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::SystemTime};
 
 use axum::{
     Json,
@@ -52,11 +52,20 @@ pub async fn auth_middleware(
 ) -> Result<Response, ApiError> {
     let session_id = auth_header.0.token();
 
-    let Session {} = state
+    let Session {
+        created_at: _,
+        expires_at,
+    } = state
         .sessions
         .get(session_id)
         .await
         .ok_or(ApiError::new(StatusCode::FORBIDDEN, "Invalid bearer token"))?;
+
+    if let Some(expires_at) = expires_at
+        && SystemTime::now() > expires_at
+    {
+        return Err(ApiError::new(StatusCode::FORBIDDEN, "Bearer token expired"));
+    }
 
     Ok(next.run(request).await)
 }
