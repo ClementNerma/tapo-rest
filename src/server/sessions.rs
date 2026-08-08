@@ -18,11 +18,11 @@ use super::{ApiResult, SharedState};
 pub struct Sessions {
     path: PathBuf,
     map: RwLock<HashMap<String, Session>>,
-    session_lifespan: Option<Duration>,
+    session_lifespan: Duration,
 }
 
 impl Sessions {
-    pub async fn create(path: PathBuf, session_lifespan: Option<Duration>) -> Result<Self> {
+    pub async fn create(path: PathBuf, session_lifespan: Duration) -> Result<Self> {
         let map = if path.exists() {
             let sessions_str = fs::read_to_string(&path)
                 .await
@@ -49,9 +49,7 @@ impl Sessions {
 
         let session = Session {
             created_at: SystemTime::now(),
-            expires_at: self
-                .session_lifespan
-                .map(|lifespan| SystemTime::now() + lifespan),
+            expires_at: SystemTime::now() + self.session_lifespan,
         };
 
         let id = Self::gen_session_id();
@@ -89,7 +87,7 @@ impl Sessions {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Session {
     pub created_at: SystemTime,
-    pub expires_at: Option<SystemTime>,
+    pub expires_at: SystemTime,
 }
 
 #[derive(Deserialize)]

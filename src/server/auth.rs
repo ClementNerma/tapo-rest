@@ -28,7 +28,9 @@ pub async fn login(
     State(state): State<SharedState>,
     Json(LoginData { password }): Json<LoginData>,
 ) -> ApiResult<String> {
-    if password != state.loaded_config.read().await.config.server_password {
+    let loaded_config = state.loaded_config.read().await;
+
+    if password != loaded_config.config.server.password {
         error!("ERROR: Invalid credentials provided");
 
         return Err(ApiError::new(
@@ -61,9 +63,8 @@ pub async fn auth_middleware(
         .await
         .ok_or(ApiError::new(StatusCode::FORBIDDEN, "Invalid bearer token"))?;
 
-    if let Some(expires_at) = expires_at
-        && SystemTime::now() > expires_at
-    {
+    if SystemTime::now() > expires_at {
+        error!("ERROR: Bearer token expired");
         return Err(ApiError::new(StatusCode::FORBIDDEN, "Bearer token expired"));
     }
 

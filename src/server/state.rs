@@ -14,17 +14,19 @@ pub struct StateData {
 }
 
 impl StateData {
-    pub async fn init(
-        config_path: PathBuf,
-        sessions_file: PathBuf,
-        session_lifetime: Option<Duration>,
-    ) -> Result<Self> {
+    pub async fn init(config_path: PathBuf, sessions_file: PathBuf) -> Result<Self> {
         let (config, devices) = load_tapo_devices_from_config(&config_path).await?;
+
+        let sessions = Sessions::create(
+            sessions_file,
+            Duration::from_secs(config.server.sessions_lifetime_in_seconds),
+        )
+        .await?;
 
         Ok(Self {
             config_path,
             loaded_config: RwLock::new(LoadedConfig::new(config, devices)),
-            sessions: Sessions::create(sessions_file, session_lifetime).await?,
+            sessions,
         })
     }
 

@@ -26,7 +26,7 @@ async fn load_tapo_devices(config: &Config) -> Result<Vec<TapoDevice>> {
     let Config {
         devices,
         tapo_credentials,
-        server_password: _,
+        server: _,
     } = config;
 
     let mut tasks = JoinSet::new();

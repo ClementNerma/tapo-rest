@@ -8,7 +8,7 @@ use crate::server::TapoDeviceType;
 pub struct Config {
     pub tapo_credentials: TapoCredentials,
     pub devices: Vec<TapoConnectionInfos>,
-    pub server_password: String,
+    pub server: ServerConfig,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -22,4 +22,10 @@ pub struct TapoConnectionInfos {
     pub name: String,
     pub device_type: TapoDeviceType,
     pub ip_addr: IpAddr,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ServerConfig {
+    pub password: String,
+    pub sessions_lifetime_in_seconds: u64,
 }
