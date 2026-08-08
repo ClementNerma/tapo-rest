@@ -32,7 +32,6 @@ tokio = { version = "1.53.1", features = [
   "signal",
 ] }
 tower-http = { version = "0.7.0", features = ["cors"] }
-dirs = "6.0.0"
 paste = "1.0.15"
 axum-extra = { version = "0.12.6", features = ["typed-header"] }
 chrono = { version = "0.4.45", default-features = false, features = [

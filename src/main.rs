@@ -35,9 +35,8 @@
 
 use std::process::ExitCode;
 
-use anyhow::{Context, Result, bail};
+use anyhow::{Result, bail};
 use log::{error, info};
-use tokio::fs;
 
 use crate::cmd::Cmd;
 
@@ -69,17 +68,6 @@ async fn inner_main() -> Result<()> {
 
     // Set up the logger
     Logger::new(verbosity).init().unwrap();
-
-    let data_dir = dirs::state_dir()
-        .or_else(dirs::data_local_dir)
-        .context("Failed to find a valid local data directory")?
-        .join(env!("CARGO_PKG_NAME"));
-
-    if !data_dir.exists() {
-        fs::create_dir_all(&data_dir)
-            .await
-            .context("Failed to create a local data directory")?;
-    }
 
     if !config_path.is_file() {
         bail!(
