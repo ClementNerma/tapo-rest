@@ -1,3 +1,5 @@
+#!/usr/bin/nu
+
 # Due to difficulties building cross-platform binaries with Docker,
 # I resort here to building locally using `cross` and then copying the
 # output into a container.
