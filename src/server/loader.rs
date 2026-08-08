@@ -1,28 +1,13 @@
-use std::{path::Path, sync::Arc};
+use std::sync::Arc;
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use colored::Colorize;
 use log::{error, info};
-use tokio::{fs, task::JoinSet};
+use tokio::task::JoinSet;
 
 use crate::{config::Config, devices::TapoDevice};
 
-pub async fn load_tapo_devices_from_config(
-    config_path: &Path,
-) -> Result<(Config, Vec<TapoDevice>)> {
-    let config_str = fs::read_to_string(&config_path)
-        .await
-        .context("Failed to read the devices configuration file")?;
-
-    let config = serde_json::from_str::<Config>(&config_str)
-        .context("Failed to parse the devices configuration file")?;
-
-    let devices = load_tapo_devices(&config).await?;
-
-    Ok((config, devices))
-}
-
-async fn load_tapo_devices(config: &Config) -> Result<Vec<TapoDevice>> {
+pub async fn load_tapo_devices(config: &Config) -> Result<Vec<TapoDevice>> {
     let Config {
         devices,
         tapo_credentials,
