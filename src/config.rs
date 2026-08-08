@@ -27,5 +27,11 @@ pub struct TapoConnectionInfos {
 #[derive(Serialize, Deserialize)]
 pub struct ServerConfig {
     pub password: String,
-    pub sessions_lifetime_in_seconds: u64,
+    pub api_keys: Vec<ServerApiKey>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ServerApiKey {
+    pub name: String,
+    pub key: String,
 }

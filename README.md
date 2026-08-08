@@ -32,7 +32,12 @@ Start by creating a JSON config file (anywhere) with the following structure:
     ],
     "server": {
         "password": "<whatever you want, must be unguessable>",
-        "sessions_lifetime_in_seconds": 3600 // here, 1 hour ; can be any duration you want
+        "api_keys": [
+            {
+                "name": "Home Assistant",
+                "key": "mysuperapikeyforhomeassistant"
+            }
+        ]
     }
 }
 ```
@@ -63,18 +68,12 @@ Before exposing the REST API, the server starts by connecting to all the devices
 
 ## Authentication
 
-Clients call the `POST /login` route with a body of `{ "password": "potatoes" }`. This returns a raw string, which is the session ID.
-
-```shell
-curl -i -X POST -H 'Content-Type: application/json' --data '{ "password": "potatoes" }' http://localhost:8000/login
-```
-
-All subsequent calls to the API must include an `Authorization` header containing the session ID (`Authorization: Bearer <session ID>`). Sessions are preserved after server restart.
+All calls to the API actions must include an `Authorization` header containing the API key (`Authorization: Bearer <API key>`).
 
 You can then access all your devices through the `/actions` routes. Each route takes a `?device=<name>` query parameter to know which device you are trying to interact with. The `<name>` is the same as the one you provided in your config file.
 
 ```shell
-curl -i -X GET -H 'Authorization: Bearer <your session ID>' 'http://localhost:8000/actions/l530/on?device=living-room-bulb'
+curl -i -X GET -H 'Authorization: Bearer <your API key>' 'http://localhost:8000/actions/l530/on?device=living-room-bulb'
 ```
 
 You can find the list of all available actions by checking `/actions`, and the list of all configured devices on `/devices`.

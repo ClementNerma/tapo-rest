@@ -2457,7 +2457,6 @@ dependencies = [
  "dirs",
  "log",
  "paste",
- "rand 0.10.2",
  "serde",
  "serde_json",
  "tapo",

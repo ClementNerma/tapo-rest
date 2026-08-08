@@ -3,24 +3,25 @@ use std::{path::PathBuf, sync::Arc};
 use anyhow::{Context, Result};
 use axum::{
     Json, Router,
-    extract::State,
+    extract::{Query, State},
+    http::StatusCode,
     middleware,
     routing::{get, post},
 };
 use colored::Colorize;
 use log::{error, info};
+use serde::Deserialize;
 use tokio::net::TcpListener;
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
 use crate::{config::TapoConnectionInfos, server::actions::make_actions_router};
 
-use self::{auth::auth_middleware, sessions::refresh_session, state::StateData};
+use self::{auth::auth_middleware, state::StateData};
 
 mod actions;
 mod auth;
 mod errors;
 mod loader;
-mod sessions;
 mod state;
 
 pub use actions::TapoDeviceType;
@@ -30,17 +31,10 @@ pub type SharedState = Arc<StateData>;
 
 pub struct ServeOptions {
     pub config_path: PathBuf,
-    pub sessions_file: PathBuf,
     pub port: u16,
 }
 
-pub async fn serve(options: ServeOptions) -> Result<()> {
-    let ServeOptions {
-        config_path,
-        sessions_file,
-        port,
-    } = options;
-
+pub async fn serve(ServeOptions { config_path, port }: ServeOptions) -> Result<()> {
     let cors = CorsLayer::new()
         .allow_methods(AllowMethods::any())
         .allow_headers(AllowHeaders::any())
@@ -51,7 +45,7 @@ pub async fn serve(options: ServeOptions) -> Result<()> {
 
     let (actions_router, actions_route_uris) = make_actions_router();
 
-    let state = Arc::new(StateData::init(config_path, sessions_file).await?);
+    let state = Arc::new(StateData::init(config_path).await?);
 
     let app = Router::new()
         // Reload the configuration file
@@ -67,8 +61,6 @@ pub async fn serve(options: ServeOptions) -> Result<()> {
             Arc::clone(&state),
             auth_middleware,
         ))
-        // Login route
-        .route("/login", post(auth::login))
         // List all available actions
         .route(
             "/actions",
@@ -119,6 +111,32 @@ async fn reload_config(state: State<Arc<StateData>>) -> ApiResult<()> {
         .reload_config()
         .await
         .context("Failed to reload config")?;
+
+    Ok(())
+}
+
+#[derive(Deserialize)]
+pub struct RefreshDeviceSessionParams {
+    device: String,
+}
+
+pub async fn refresh_session(
+    State(state): State<SharedState>,
+    Query(params): Query<RefreshDeviceSessionParams>,
+) -> ApiResult<()> {
+    let RefreshDeviceSessionParams { device } = params;
+
+    let loaded_config = state.loaded_config.read().await;
+
+    let device = loaded_config
+        .devices
+        .get(&device)
+        .ok_or_else(|| (StatusCode::NOT_FOUND, format!("Unknown device: {device}")))?;
+
+    device
+        .refresh_session()
+        .await
+        .context("Failed to refresh device's session")?;
 
     Ok(())
 }

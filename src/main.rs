@@ -90,10 +90,5 @@ async fn inner_main() -> Result<()> {
 
     info!("Now launching server...");
 
-    server::serve(ServeOptions {
-        config_path,
-        sessions_file: data_dir.join("sessions.json"),
-        port,
-    })
-    .await
+    server::serve(ServeOptions { config_path, port }).await
 }
