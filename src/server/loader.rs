@@ -58,7 +58,7 @@ async fn load_tapo_devices(config: &Config) -> Result<Vec<TapoDevice>> {
         match conn_result {
             Ok(()) => info!("|> Device {} connected successfully!", name.bright_yellow()),
 
-            Err(err) => error!("! Failed to connect to device '{name}': {err}",),
+            Err(err) => error!("! Failed to connect to device '{name}': {err}"),
         }
 
         devices.push(device);

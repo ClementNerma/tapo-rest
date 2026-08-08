@@ -44,7 +44,7 @@ impl LoadedConfig {
             config,
             devices: devices
                 .into_iter()
-                .map(|device| (device.conn_infos().name.to_owned(), device))
+                .map(|device| (device.conn_infos().name.clone(), device))
                 .collect(),
         }
     }

@@ -70,7 +70,7 @@ impl Sessions {
         let mut rng = rand::rng();
 
         (1..32)
-            .map(|_| rng.sample(Alphanumeric) as char)
+            .map(|_| char::from(rng.sample(Alphanumeric)))
             .collect::<String>()
     }
 }

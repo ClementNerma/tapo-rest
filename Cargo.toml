@@ -2,6 +2,15 @@
 name = "tapo-rest"
 version = "0.4.7"
 edition = "2024"
+description = "A REST API for controlling Tapo devices"
+license = "Apache-2.0"
+repository = "https://github.com/ClementNerma/tapo-rest"
+keywords = ["tapo", "rest", "api", "iot", "smart home"]
+categories = [
+  "command-line-utilities",
+  "network-programming",
+  "web-programming",
+]
 
 [dependencies]
 anyhow = "1.0.104"
@@ -17,7 +26,12 @@ rand = "0.10.2"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
 tapo = "0.9.0"
-tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "fs", "signal"] }
+tokio = { version = "1.53.1", features = [
+  "macros",
+  "rt-multi-thread",
+  "fs",
+  "signal",
+] }
 tower-http = { version = "0.7.0", features = ["cors"] }
 dirs = "6.0.0"
 paste = "1.0.15"
