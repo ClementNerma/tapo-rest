@@ -4,9 +4,7 @@
 # I resort here to building locally using `cross` and then copying the
 # output into a container.
 
-if (which cross | is-empty) {
-  error make 'Please install "cross" to continue.'
-}
+if (which cargo-zigbuild | is-empty) { error make 'Please install "cargo-zigbuild" to continue.'}
 
 let dockerCmd = if not (which docker | is-empty) {
   'docker'
@@ -43,7 +41,7 @@ for entry in $targets {
     # may clash between platforms
     let target_dir = $"($build_dir)/targets/($target)"
     mkdir $target_dir
-    cross build --release --target $target --target-dir $target_dir
+    cargo zigbuild --release --target $target --target-dir $target_dir
 
     # Put build artifact in the correct directory
     let artifacts_file = $"($build_dir)/artifacts/($docker_platform)/($name)"
