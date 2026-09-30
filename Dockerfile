@@ -1,7 +1,7 @@
 # This file is not intended to be used directly ;
 # please refer to the build script instead
 
-FROM debian:bookworm-slim
+FROM debian:13-slim
 
 # These three are provided by docker buildx
 ARG TARGETOS
